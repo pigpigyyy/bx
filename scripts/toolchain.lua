@@ -1137,7 +1137,7 @@ function toolchain(_buildDir, _libDir)
 		libdirs { path.join(_libDir, "lib/ios-simulator") }
 		linkoptions {
 			"-mios-simulator-version-min=7.0",
-			"-arch i386",
+			"-arch x86_64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/Frameworks",
@@ -1145,7 +1145,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"-mios-simulator-version-min=7.0",
-			"-arch i386",
+			"-arch x86_64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
 
