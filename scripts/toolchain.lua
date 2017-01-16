@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2017 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
@@ -39,6 +39,7 @@ function toolchain(_buildDir, _libDir)
 			{ "pnacl",           "Native Client - PNaCl"      },
 			{ "orbis",           "Orbis"                      },
 			{ "qnx-arm",         "QNX/Blackberry - ARM"       },
+			{ "riscv",           "RISC-V"                     },
 			{ "rpi",             "RaspberryPi"                },
 		},
 	}
@@ -406,9 +407,9 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-rpi"))
 
 		elseif "riscv" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "$(RISCV_DIR)/bin/riscv64-unknown-elf-gcc"
-			premake.gcc.cxx = "$(RISCV_DIR)/bin/riscv64-unknown-elf-g++"
-			premake.gcc.ar  = "$(RISCV_DIR)/bin/riscv64-unknown-elf-ar"
+			premake.gcc.cc  = "$(FREEDOM_E_SDK)/toolchain/bin/riscv32-unknown-elf-gcc"
+			premake.gcc.cxx = "$(FREEDOM_E_SDK)/toolchain/bin/riscv32-unknown-elf-g++"
+			premake.gcc.ar  = "$(FREEDOM_E_SDK)/toolchain/bin/riscv32-unknown-elf-ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-riscv"))
 
 		end
@@ -739,6 +740,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
+			"-Wl,--as-needed",
 		}
 
 	configuration { "linux-gcc*", "x32" }
@@ -1306,13 +1308,18 @@ function toolchain(_buildDir, _libDir)
 	configuration { "riscv" }
 		targetdir (path.join(_buildDir, "riscv/bin"))
 		objdir (path.join(_buildDir, "riscv/obj"))
+		defines {
+			"__BSD_VISIBLE",
+			"__MISC_VISIBLE",
+		}
 		includedirs {
-			"$(RISCV_DIR)/sysroot/usr/include",
+			"$(FREEDOM_E_SDK)/toolchain/riscv32-unknown-elf/include",
+			path.join(bxDir, "include/compat/riscv"),
 		}
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
-			"--sysroot=$(RISCV_DIR)/sysroot",
+			"--sysroot=$(FREEDOM_E_SDK)/toolchain/riscv32-unknown-elf",
 		}
 		buildoptions_cpp {
 			"-std=c++11",

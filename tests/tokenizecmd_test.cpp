@@ -1,10 +1,9 @@
 /*
- * Copyright 2012-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2012-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #include "test.h"
-#include <bx/tokenizecmd.h>
 #include <bx/commandline.h>
 #include <string.h>
 
