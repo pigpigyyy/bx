@@ -37,6 +37,9 @@ namespace bx
 	template<typename Ty>
 	void xchg(Ty& _a, Ty& _b);
 
+	///
+	void xchg(void* _a, void* _b, size_t _numBytes);
+
 	// http://cnicholson.net/2011/01/stupid-c-tricks-a-better-sizeof_array/
 	template<typename T, size_t N>
 	char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T(&)[N]) )[N];
@@ -58,6 +61,9 @@ namespace bx
 
 	///
 	void memSet(void* _dst, uint8_t _ch, size_t _numBytes);
+
+	///
+	int32_t memCmp(const void* _lhs, const void* _rhs, size_t _numBytes);
 
 } // namespace bx
 

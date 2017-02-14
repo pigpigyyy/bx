@@ -10,7 +10,6 @@
 #include <wchar.h>  // wchar_t
 
 #include "allocator.h"
-#include "hash.h"
 
 namespace bx
 {
@@ -111,7 +110,19 @@ namespace bx
 	char toLower(char _ch);
 
 	///
+	void toLowerUnsafe(char* _inOutStr, size_t _len);
+
+	///
+	void toLower(char* _inOutStr, size_t _max = INT32_MAX);
+
+	///
 	char toUpper(char _ch);
+
+	///
+	void toUpperUnsafe(char* _inOutStr, size_t _len);
+
+	///
+	void toUpper(char* _inOutStr, size_t _max = INT32_MAX);
 
 	///
 	bool toBool(const char* _str);
@@ -224,13 +235,13 @@ namespace bx
 	int32_t toString(char* _out, size_t _max, int32_t _value, uint32_t _base = 10);
 
 	///
+	int32_t toString(char* _out, size_t _max, int64_t _value, uint32_t _base = 10);
+
+	///
 	int32_t toString(char* _out, size_t _max, uint32_t _value, uint32_t _base = 10);
 
 	///
-	uint32_t hashMurmur2A(const StringView& _data);
-
-	///
-	uint32_t hashMurmur2A(const char* _data);
+	int32_t toString(char* _out, size_t _max, uint64_t _value, uint32_t _base = 10);
 
 } // namespace bx
 

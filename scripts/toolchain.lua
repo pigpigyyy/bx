@@ -1309,6 +1309,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		links {
 			"rt",
+			"dl",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
