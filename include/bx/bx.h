@@ -12,6 +12,7 @@
 #include <stdlib.h> // size_t
 #include <stddef.h> // ptrdiff_t
 
+#include "platform.h"
 #include "config.h"
 #include "macros.h"
 
@@ -67,6 +68,6 @@ namespace bx
 
 } // namespace bx
 
-#include "bx.inl"
+#include "inline/bx.inl"
 
 #endif // BX_H_HEADER_GUARD

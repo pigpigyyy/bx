@@ -8,6 +8,11 @@ newoption {
 	description = "Enable amalgamated build.",
 }
 
+newoption {
+	trigger = "with-crtnone",
+	description = "Enable build without CRT.",
+}
+
 solution "bx"
 	configurations {
 		"Debug",
@@ -55,7 +60,7 @@ project "bx.test"
 
 	files {
 		path.join(BX_DIR, "tests/*_test.cpp"),
-		path.join(BX_DIR, "tests/*_test.H"),
+		path.join(BX_DIR, "tests/*.h"),
 		path.join(BX_DIR, "tests/dbg.*"),
 	}
 
