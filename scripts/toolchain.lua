@@ -205,7 +205,7 @@ function toolchain(_buildDir, _libDir)
 			if not os.getenv("ANDROID_NDK_ARM")
 			or not os.getenv("ANDROID_NDK_CLANG")
 			or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_CLANG and ANDROID_NDK_ROOT envrionment variables.")
+				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
@@ -219,7 +219,7 @@ function toolchain(_buildDir, _libDir)
 			if not os.getenv("ANDROID_NDK_MIPS")
 			or not os.getenv("ANDROID_NDK_CLANG")
 			or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_MIPS and ANDROID_NDK_ROOT envrionment variables.")
+				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
@@ -233,7 +233,7 @@ function toolchain(_buildDir, _libDir)
 			if not os.getenv("ANDROID_NDK_X86")
 			or not os.getenv("ANDROID_NDK_CLANG")
 			or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_X86 and ANDROID_NDK_ROOT envrionment variables.")
+				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
