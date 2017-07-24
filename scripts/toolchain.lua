@@ -201,7 +201,7 @@ function toolchain(_buildDir, _libDir)
 			if not os.getenv("ANDROID_NDK_ARM")
 			or not os.getenv("ANDROID_NDK_CLANG")
 			or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT envrionment variables.")
+				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT environment variables.")
 			end
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
@@ -215,7 +215,7 @@ function toolchain(_buildDir, _libDir)
 			if not os.getenv("ANDROID_NDK_MIPS")
 			or not os.getenv("ANDROID_NDK_CLANG")
 			or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT envrionment variables.")
+				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT environment variables.")
 			end
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
@@ -229,7 +229,7 @@ function toolchain(_buildDir, _libDir)
 			if not os.getenv("ANDROID_NDK_X86")
 			or not os.getenv("ANDROID_NDK_CLANG")
 			or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT envrionment variables.")
+				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT environment variables.")
 			end
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
@@ -241,7 +241,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "asmjs" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
-				print("Set EMSCRIPTEN enviroment variable.")
+				print("Set EMSCRIPTEN environment variable.")
 			end
 
 			premake.gcc.cc   = "\"$(EMSCRIPTEN)/emcc\""
@@ -313,7 +313,7 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "linux-steamlink" == _OPTIONS["gcc"] then
 			if not os.getenv("MARVELL_SDK_PATH") then
-				print("Set MARVELL_SDK_PATH enviroment variable.")
+				print("Set MARVELL_SDK_PATH environment variable.")
 			end
 
 			premake.gcc.cc  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-gcc"
@@ -322,6 +322,10 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-steamlink"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
+			if not os.getenv("MINGW") then
+				print("Set MINGW environment variable.")
+			end
+
 			local mingwToolchain = "x86_64-w64-mingw32"
 			if compiler32bit then
 				if os.is("linux") then
@@ -351,7 +355,7 @@ function toolchain(_buildDir, _libDir)
 
 			if os.is("linux") then
 				if not os.getenv("OSXCROSS") then
-					print("Set OSXCROSS enviroment variable.")
+					print("Set OSXCROSS environment variable.")
 				end
 
 				local osxToolchain = "x86_64-apple-darwin15-"
@@ -364,7 +368,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "orbis" == _OPTIONS["gcc"] then
 
 			if not os.getenv("SCE_ORBIS_SDK_DIR") then
-				print("Set SCE_ORBIS_SDK_DIR enviroment variable.")
+				print("Set SCE_ORBIS_SDK_DIR environment variable.")
 			end
 
 			orbisToolchain = "$(SCE_ORBIS_SDK_DIR)/host_tools/bin/orbis-"
@@ -377,7 +381,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "qnx-arm" == _OPTIONS["gcc"] then
 
 			if not os.getenv("QNX_HOST") then
-				print("Set QNX_HOST enviroment variable.")
+				print("Set QNX_HOST environment variable.")
 			end
 
 			premake.gcc.cc  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc"
@@ -450,7 +454,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "orbis" == _OPTIONS["vs"] then
 
 			if not os.getenv("SCE_ORBIS_SDK_DIR") then
-				print("Set SCE_ORBIS_SDK_DIR enviroment variable.")
+				print("Set SCE_ORBIS_SDK_DIR environment variable.")
 			end
 
 			platforms { "Orbis" }
@@ -971,6 +975,9 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-Wundef",
 		}
+		buildoptions_cpp {
+			"-std=c++11",
+		}
 
 	configuration { "freebsd" }
 		targetdir (path.join(_buildDir, "freebsd/bin"))
@@ -1031,6 +1038,9 @@ function toolchain(_buildDir, _libDir)
 		buildoptions_cpp {
 			"-std=c++11",
 		}
+		buildoptions_objcpp {
+			"-std=c++11",
+		}
 		buildoptions {
 			"-Wfatal-errors",
 			"-msse2",
@@ -1044,6 +1054,9 @@ function toolchain(_buildDir, _libDir)
 			"-lc++",
 		}
 		buildoptions_cpp {
+			"-std=c++11",
+		}
+		buildoptions_objcpp {
 			"-std=c++11",
 		}
 		buildoptions {
@@ -1170,12 +1183,8 @@ function toolchain(_buildDir, _libDir)
 			"$(SCE_ORBIS_SDK_DIR)/target/include",
 			"$(SCE_ORBIS_SDK_DIR)/target/include_common",
 		}
-		buildoptions {
-		}
 		buildoptions_cpp {
 			"-std=c++11",
-		}
-		linkoptions {
 		}
 
 	configuration { "qnx-arm" }

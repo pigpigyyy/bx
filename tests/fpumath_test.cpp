@@ -4,7 +4,7 @@
  */
 
 #include "test.h"
-#include <bx/fpumath.h>
+#include <bx/math.h>
 
 #if !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 #include <cmath>
@@ -77,9 +77,9 @@ TEST_CASE("quaternion", "")
 	bx::mtxIdentity(mtx);
 	mtxCheck(mtxQ, mtx);
 
-	float ax = bx::pi/27.0f;
-	float ay = bx::pi/13.0f;
-	float az = bx::pi/7.0f;
+	float ax = bx::kPi/27.0f;
+	float ay = bx::kPi/13.0f;
+	float az = bx::kPi/7.0f;
 
 	bx::quatRotateX(quat, ax);
 	bx::mtxQuat(mtxQ, quat);
