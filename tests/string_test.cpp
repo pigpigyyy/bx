@@ -8,6 +8,8 @@
 #include <bx/handlealloc.h>
 #include <bx/sort.h>
 
+#include <string.h>
+
 bx::AllocatorI* g_allocator;
 
 TEST_CASE("chars", "")
@@ -49,6 +51,7 @@ TEST_CASE("strCopy", "")
 	REQUIRE(num == 3);
 
 	num = bx::strCopy(dst, sizeof(dst), "blah");
+	REQUIRE(0 == bx::strCmp(dst, "bl", 2) );
 	REQUIRE(0 == bx::strCmp(dst, "blah") );
 	REQUIRE(num == 4);
 }
@@ -62,6 +65,7 @@ TEST_CASE("strCat", "")
 	REQUIRE(4 == bx::strCopy(dst, 5, "copy") );
 	REQUIRE(3 == bx::strCat(dst, 8, "cat") );
 	REQUIRE(0 == bx::strCmp(dst, "copycat") );
+	REQUIRE(0 == bx::strCmp(dst, "copy", 4) );
 
 	REQUIRE(1 == bx::strCat(dst, BX_COUNTOF(dst), "------", 1) );
 	REQUIRE(3 == bx::strCat(dst, BX_COUNTOF(dst), "cat") );
@@ -80,6 +84,7 @@ TEST_CASE("strCmpI", "")
 	const char* empty = "";
 	REQUIRE(0 == bx::strCmpI(abvgd, abvgd) );
 	REQUIRE(0 == bx::strCmpI(abvgd, abvgx, 4) );
+	REQUIRE(0 == bx::strCmpI(empty, empty) );
 
 	REQUIRE(0 >  bx::strCmpI(abvgd, abvgx) );
 	REQUIRE(0 >  bx::strCmpI(empty, abvgd) );
@@ -100,6 +105,7 @@ TEST_CASE("strCmpV", "")
 	const char* empty = "";
 	REQUIRE(0 == bx::strCmpV(abvgd, abvgd) );
 	REQUIRE(0 == bx::strCmpV(abvgd, abvgx, 4) );
+	REQUIRE(0 == bx::strCmpV(empty, empty) );
 
 	REQUIRE(0 >  bx::strCmpV(abvgd, abvgx) );
 	REQUIRE(0 >  bx::strCmpV(empty, abvgd) );
@@ -153,8 +159,8 @@ TEST_CASE("strCmpV sort", "")
 TEST_CASE("strRFind", "")
 {
 	const char* test = "test";
-	REQUIRE(NULL == bx::strRFind(test, 's', 0) );
-	REQUIRE(NULL == bx::strRFind(test, 's', 1) );
+	REQUIRE(NULL == bx::strRFind(bx::StringView(test, 0), 's') );
+	REQUIRE(NULL == bx::strRFind(bx::StringView(test, 1), 's') );
 	REQUIRE(&test[2] == bx::strRFind(test, 's') );
 }
 
@@ -162,9 +168,9 @@ TEST_CASE("strFindI", "")
 {
 	const char* test = "The Quick Brown Fox Jumps Over The Lazy Dog.";
 
-	REQUIRE(NULL == bx::strFindI(test, "quick", 8) );
+	REQUIRE(NULL == bx::strFindI(bx::StringView(test, 8), "quick") );
 	REQUIRE(NULL == bx::strFindI(test, "quick1") );
-	REQUIRE(&test[4] == bx::strFindI(test, "quick", 9) );
+	REQUIRE(&test[4] == bx::strFindI(bx::StringView(test, 9), "quick") );
 	REQUIRE(&test[4] == bx::strFindI(test, "quick") );
 }
 
@@ -173,22 +179,22 @@ TEST_CASE("strFind", "")
 	{
 		const char* test = "test";
 
-		REQUIRE(NULL == bx::strFind(test, 's', 0) );
-		REQUIRE(NULL == bx::strFind(test, 's', 2) );
+		REQUIRE(NULL == bx::strFind(bx::StringView(test, 0), 's') );
+		REQUIRE(NULL == bx::strFind(bx::StringView(test, 2), 's') );
 		REQUIRE(&test[2] == bx::strFind(test, 's') );
 	}
 
 	{
 		const char* test = "The Quick Brown Fox Jumps Over The Lazy Dog.";
 
-		REQUIRE(NULL == bx::strFind(test, "quick", 8) );
+		REQUIRE(NULL == bx::strFind(bx::StringView(test, 8), "quick") );
 		REQUIRE(NULL == bx::strFind(test, "quick1") );
-		REQUIRE(NULL == bx::strFind(test, "quick", 9) );
+		REQUIRE(NULL == bx::strFind(bx::StringView(test, 9), "quick") );
 		REQUIRE(NULL == bx::strFind(test, "quick") );
 
-		REQUIRE(NULL == bx::strFind(test, "Quick", 8) );
+		REQUIRE(NULL == bx::strFind(bx::StringView(test, 8), "Quick") );
 		REQUIRE(NULL == bx::strFind(test, "Quick1") );
-		REQUIRE(&test[4] == bx::strFind(test, "Quick", 9) );
+		REQUIRE(&test[4] == bx::strFind(bx::StringView(test, 9), "Quick") );
 		REQUIRE(&test[4] == bx::strFind(test, "Quick") );
 	}
 }
@@ -316,8 +322,8 @@ TEST_CASE("fromString int32_t", "")
 	REQUIRE(testFromString(1389,   "1389") );
 	REQUIRE(testFromString(1389,   "  1389") );
 	REQUIRE(testFromString(1389,   "+1389") );
-	REQUIRE(testFromString(-1389,   "-1389") );
-	REQUIRE(testFromString(-1389,   " -1389") );
+	REQUIRE(testFromString(-1389,  "-1389") );
+	REQUIRE(testFromString(-1389,  " -1389") );
 	REQUIRE(testFromString(555333, "555333") );
 	REQUIRE(testFromString(-21,    "-021") );
 }

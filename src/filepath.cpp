@@ -8,7 +8,7 @@
 #include <bx/readerwriter.h>
 
 #if BX_PLATFORM_WINDOWS
-extern "C" __declspec(dllimport) uint32_t __stdcall GetTempPathA(uint32_t _max, char* _ptr);
+extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathA(unsigned long _max, char* _ptr);
 #endif // BX_PLATFORM_WINDOWS
 
 namespace bx
@@ -264,7 +264,7 @@ namespace bx
 		const StringView fileName = getFileName();
 		if (!fileName.isEmpty() )
 		{
-			const char* ext = strFind(fileName.getPtr(), '.', fileName.getLength() );
+			const char* ext = strFind(fileName, '.');
 			if (ext != NULL)
 			{
 				return StringView(fileName.getPtr(), ext);
@@ -279,7 +279,7 @@ namespace bx
 		const StringView fileName = getFileName();
 		if (!fileName.isEmpty() )
 		{
-			const char* ext = strFind(fileName.getPtr(), '.', fileName.getLength() );
+			const char* ext = strFind(fileName, '.');
 			return StringView(ext);
 		}
 
