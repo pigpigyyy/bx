@@ -4,11 +4,10 @@
  */
 
 #include "test.h"
+#include <bx/filepath.h>
 #include <bx/string.h>
 #include <bx/handlealloc.h>
 #include <bx/sort.h>
-
-#include <string.h>
 
 bx::AllocatorI* g_allocator;
 
@@ -70,6 +69,11 @@ TEST_CASE("strCat", "")
 	REQUIRE(1 == bx::strCat(dst, BX_COUNTOF(dst), "------", 1) );
 	REQUIRE(3 == bx::strCat(dst, BX_COUNTOF(dst), "cat") );
 	REQUIRE(0 == bx::strCmp(dst, "copycat-cat") );
+}
+
+TEST_CASE("strCmp", "")
+{
+	REQUIRE(0 != bx::strCmp("meh", "meh/") );
 }
 
 TEST_CASE("strCmpI", "")
@@ -196,6 +200,8 @@ TEST_CASE("strFind", "")
 		REQUIRE(NULL == bx::strFind(test, "Quick1") );
 		REQUIRE(&test[4] == bx::strFind(bx::StringView(test, 9), "Quick") );
 		REQUIRE(&test[4] == bx::strFind(test, "Quick") );
+
+		REQUIRE(NULL == bx::strFind("vgd", 'a') );
 	}
 }
 
@@ -248,6 +254,7 @@ TEST_CASE("toString double", "")
 	REQUIRE(testToString(1231231.23,              "1231231.23") );
 	REQUIRE(testToString(0.000000000123123,       "1.23123e-10") );
 	REQUIRE(testToString(0.0000000001,            "1e-10") );
+	REQUIRE(testToString(-270.000000,             "-270.0") );
 }
 
 static bool testFromString(double _value, const char* _input)
@@ -295,6 +302,7 @@ TEST_CASE("fromString double", "")
 	REQUIRE(testFromString(1231231.23,              "1231231.23") );
 	REQUIRE(testFromString(0.000000000123123,       "1.23123e-10") );
 	REQUIRE(testFromString(0.0000000001,            "1e-10") );
+	REQUIRE(testFromString(-270.000000,             "-270.0") );
 }
 
 static bool testFromString(int32_t _value, const char* _input)
@@ -358,4 +366,26 @@ TEST_CASE("StringView", "")
 
 	sv.clear();
 	REQUIRE(0 == sv.getLength() );
+}
+
+TEST_CASE("Trim", "")
+{
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "ab"), "vgd") );
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vagbd"), "") );
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vgd"), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("/555333/podmac/", "/"), "555333/podmac/") );
+
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "vagbd"), "") );
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "abv"), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("/555333/podmac/", "/"), "/555333/podmac") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrim("abvgd", "da"), "bvg") );
+	REQUIRE(0 == bx::strCmp(bx::strTrim("<1389>", "<>"), "1389") );
+	REQUIRE(0 == bx::strCmp(bx::strTrim("/555333/podmac/", "/"), "555333/podmac") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrim("abvgd", ""), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strTrim(" \t a b\tv g d \t ", " \t"), "a b\tv g d") );
+
+	bx::FilePath uri("/555333/podmac/");
+	REQUIRE(0 == bx::strCmp(bx::strTrim(uri.getPath(), "/"), "555333/podmac") );
 }
