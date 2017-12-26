@@ -255,6 +255,7 @@ TEST_CASE("toString double", "")
 	REQUIRE(testToString(0.000000000123123,       "1.23123e-10") );
 	REQUIRE(testToString(0.0000000001,            "1e-10") );
 	REQUIRE(testToString(-270.000000,             "-270.0") );
+	REQUIRE(testToString(2.225073858507201e-308,  "2.225073858507201e-308") );
 }
 
 static bool testFromString(double _value, const char* _input)
@@ -303,6 +304,7 @@ TEST_CASE("fromString double", "")
 	REQUIRE(testFromString(0.000000000123123,       "1.23123e-10") );
 	REQUIRE(testFromString(0.0000000001,            "1e-10") );
 	REQUIRE(testFromString(-270.000000,             "-270.0") );
+	REQUIRE(testFromString(2.2250738585072011e-308, "2.2250738585072011e-308") );
 }
 
 static bool testFromString(int32_t _value, const char* _input)
@@ -352,7 +354,7 @@ TEST_CASE("StringView", "")
 	st.append("test");
 	REQUIRE(8 == st.getLength() );
 
-	st.append("test", 2);
+	st.append(bx::StringView("test", 2) );
 	REQUIRE(10 == st.getLength() );
 
 	REQUIRE(0 == bx::strCmp(st.getPtr(), "testtestte") );
@@ -388,4 +390,10 @@ TEST_CASE("Trim", "")
 
 	bx::FilePath uri("/555333/podmac/");
 	REQUIRE(0 == bx::strCmp(bx::strTrim(uri.getPath(), "/"), "555333/podmac") );
+}
+
+TEST_CASE("strWord", "")
+{
+	REQUIRE(bx::strWord(" abvgd-1389.0").isEmpty() );
+	REQUIRE(0 == bx::strCmp(bx::strWord("abvgd-1389.0"), "abvgd") );
 }

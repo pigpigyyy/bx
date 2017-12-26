@@ -153,12 +153,6 @@ namespace bx
 		toUpperUnsafe(_inOutStr, len);
 	}
 
-	bool toBool(const char* _str)
-	{
-		char ch = toLower(_str[0]);
-		return ch == 't' ||  ch == '1';
-	}
-
 	typedef char (*CharFn)(char _ch);
 
 	inline char toNoop(char _ch)
@@ -446,6 +440,7 @@ namespace bx
 		const char* ptr   = _str.getPtr();
 		const char* chars = _chars.getPtr();
 		const uint32_t charsLen = _chars.getLength();
+
 		for (uint32_t ii = 0, len = _str.getLength(); ii < len; ++ii)
 		{
 			if (NULL == strFindUnsafe(chars, charsLen, ptr[ii]) )
@@ -459,6 +454,11 @@ namespace bx
 
 	StringView strRTrim(const StringView& _str, const StringView& _chars)
 	{
+		if (_str.isEmpty() )
+		{
+			return StringView();
+		}
+
 		const char* ptr   = _str.getPtr();
 		const char* chars = _chars.getPtr();
 		const uint32_t charsLen = _chars.getLength();
@@ -531,10 +531,17 @@ namespace bx
 		return _str;
 	}
 
-	const char* strword(const char* _str)
+	const char* strSkipWord(const char* _str, int32_t _max)
 	{
-		for (char ch = *_str++; isAlphaNum(ch) || '_' == ch; ch = *_str++) {};
+		for (char ch = *_str++; 0 < _max && (isAlphaNum(ch) || '_' == ch); ch = *_str++, --_max) {};
 		return _str-1;
+	}
+
+	StringView strWord(const StringView& _str)
+	{
+		const char* ptr  = _str.getPtr();
+		const char* term = strSkipWord(ptr, _str.getLength() );
+		return StringView(ptr, term);
 	}
 
 	const char* strmb(const char* _str, char _open, char _close)

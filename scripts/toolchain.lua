@@ -64,6 +64,7 @@ function toolchain(_buildDir, _libDir)
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "ios-simulator",   "iOS - Simulator"            },
+			{ "ios-simulator64", "iOS - Simulator 64"         },
 			{ "tvos-arm64",      "tvOS - ARM64"               },
 			{ "tvos-simulator",  "tvOS - Simulator"           },
 			{ "mingw-gcc",       "MinGW"                      },
@@ -71,7 +72,6 @@ function toolchain(_buildDir, _libDir)
 			{ "netbsd",          "NetBSD"                     },
 			{ "osx",             "OSX"                        },
 			{ "orbis",           "Orbis"                      },
-			{ "qnx-arm",         "QNX/Blackberry - ARM"       },
 			{ "riscv",           "RISC-V"                     },
 			{ "rpi",             "RaspberryPi"                },
 		},
@@ -90,10 +90,7 @@ function toolchain(_buildDir, _libDir)
 			{ "vs2013-xp",     "Visual Studio 2013 targeting XP" },
 			{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
 			{ "vs2017-xp",     "Visual Studio 2017 targeting XP" },
-			{ "winphone8",     "Windows Phone 8.0"               },
-			{ "winphone81",    "Windows Phone 8.1"               },
-			{ "winstore81",    "Windows Store 8.1"               },
-			{ "winstore82",    "Universal Windows App"           },
+			{ "winstore100",   "Universal Windows App 10.0"      },
 			{ "durango",       "Durango"                         },
 			{ "orbis",         "Orbis"                           },
 		},
@@ -120,6 +117,12 @@ function toolchain(_buildDir, _libDir)
 		trigger     = "with-ios",
 		value       = "#",
 		description = "Set iOS target version (default: 8.0).",
+	}
+
+	newoption {
+		trigger     = "with-macos",
+		value       = "#",
+		description = "Set macOS target version (default 10.11).",
 	}
 
 	newoption {
@@ -168,6 +171,11 @@ function toolchain(_buildDir, _libDir)
 	local iosPlatform = ""
 	if _OPTIONS["with-ios"] then
 		iosPlatform = _OPTIONS["with-ios"]
+	end
+
+	local macosPlatform = ""
+	if _OPTIONS["with-macos"] then
+		macosPlatform = _OPTIONS["with-macos"]
 	end
 
 	local tvosPlatform = ""
@@ -265,6 +273,12 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator"))
+
+		elseif "ios-simulator64" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.ar  = "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator64"))
 
 		elseif "tvos-arm64" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
@@ -378,17 +392,6 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar  = orbisToolchain .. "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-orbis"))
 
-		elseif "qnx-arm" == _OPTIONS["gcc"] then
-
-			if not os.getenv("QNX_HOST") then
-				print("Set QNX_HOST environment variable.")
-			end
-
-			premake.gcc.cc  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc"
-			premake.gcc.cxx = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-g++"
-			premake.gcc.ar  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-qnx-arm"))
-
 		elseif "rpi" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-rpi"))
 
@@ -419,28 +422,12 @@ function toolchain(_buildDir, _libDir)
 			end
 			location (path.join(_buildDir, "projects", _ACTION .. "-clang"))
 
-		elseif "winphone8" == _OPTIONS["vs"] then
-			premake.vstudio.toolset = "v110_wp80"
-			location (path.join(_buildDir, "projects", _ACTION .. "-winphone8"))
-
-		elseif "winphone81" == _OPTIONS["vs"] then
-			premake.vstudio.toolset = "v120_wp81"
-			premake.vstudio.storeapp = "8.1"
-			platforms { "ARM" }
-			location (path.join(_buildDir, "projects", _ACTION .. "-winphone81"))
-
-		elseif "winstore81" == _OPTIONS["vs"] then
-			premake.vstudio.toolset = "v120"
-			premake.vstudio.storeapp = "8.1"
-			platforms { "ARM" }
-			location (path.join(_buildDir, "projects", _ACTION .. "-winstore81"))
-
-		elseif "winstore82" == _OPTIONS["vs"] then
-			premake.vstudio.toolset = "v140"
-			premake.vstudio.storeapp = "8.2"
+		elseif "winstore100" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v141"
+			premake.vstudio.storeapp = "10.0"
 
 			platforms { "ARM" }
-			location (path.join(_buildDir, "projects", _ACTION .. "-winstore82"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-winstore100"))
 
 		elseif "durango" == _OPTIONS["vs"] then
 			if not os.getenv("DurangoXDK") then
@@ -479,16 +466,23 @@ function toolchain(_buildDir, _libDir)
 		end
 
 	elseif _ACTION == "xcode4" then
+		local action = premake.action.current()
+		local str_or = function(str, def)
+			return #str > 0 and str or def
+		end
 
 		if "osx" == _OPTIONS["xcode"] then
+			action.xcode.macOSTargetPlatformVersion = str_or(macosPlatform, "10.11")
 			premake.xcode.toolset = "macosx"
 			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
 
 		elseif "ios" == _OPTIONS["xcode"] then
+			action.xcode.iOSTargetPlatformVersion = str_or(iosPlatform, "8.0")
 			premake.xcode.toolset = "iphoneos"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios"))
 
 		elseif "tvos" == _OPTIONS["xcode"] then
+			action.xcode.tvOSTargetPlatformVersion = str_or(tvosPlatform, "9.0")
 			premake.xcode.toolset = "appletvos"
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos"))
 		end
@@ -620,10 +614,16 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang/bin"))
 		objdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang/obj"))
 
-	configuration { "winphone8* or winstore8*" }
+	configuration { "winstore*" }
 		removeflags {
 			"StaticRuntime",
-			"NoExceptions",
+			"NoBufferSecurityCheck",
+		}
+		buildoptions {
+			"/wd4530", -- vccorlib.h(1345): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+		}
+		linkoptions {
+			"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
 		}
 
 	configuration { "*-gcc* or osx" }
@@ -1130,6 +1130,24 @@ function toolchain(_buildDir, _libDir)
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
 
+	configuration { "ios-simulator64" }
+		targetdir (path.join(_buildDir, "ios-simulator64/bin"))
+		objdir (path.join(_buildDir, "ios-simulator64/obj"))
+		libdirs { path.join(_libDir, "lib/ios-simulator64") }
+		linkoptions {
+			"-mios-simulator-version-min=7.0",
+			"-arch x86_64",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+		}
+		buildoptions {
+			"-mios-simulator-version-min=7.0",
+			"-arch x86_64",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
+		}
+
 	configuration { "tvos*" }
 		linkoptions {
 			"-lc++",
@@ -1189,20 +1207,6 @@ function toolchain(_buildDir, _libDir)
 			path.join(bxDir, "include/compat/freebsd"),
 			"$(SCE_ORBIS_SDK_DIR)/target/include",
 			"$(SCE_ORBIS_SDK_DIR)/target/include_common",
-		}
-		buildoptions_cpp {
-			"-std=c++11",
-		}
-
-	configuration { "qnx-arm" }
-		targetdir (path.join(_buildDir, "qnx-arm/bin"))
-		objdir (path.join(_buildDir, "qnx-arm/obj"))
-		libdirs { path.join(_libDir, "lib/qnx-arm") }
---		includedirs { path.join(bxDir, "include/compat/qnx") }
-		buildoptions {
-			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
-			"-Wunused-value",
-			"-Wundef",
 		}
 		buildoptions_cpp {
 			"-std=c++11",
