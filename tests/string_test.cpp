@@ -8,8 +8,26 @@
 #include <bx/string.h>
 #include <bx/handlealloc.h>
 #include <bx/sort.h>
+#include <string>
 
 bx::AllocatorI* g_allocator;
+
+TEST_CASE("stringPrintfTy", "")
+{
+	std::string test;
+	bx::stringPrintf(test, "printf into std::string.");
+	REQUIRE(0 == bx::strCmp(bx::StringView(test), "printf into std::string.") );
+}
+
+TEST_CASE("prettify", "")
+{
+	char tmp[1024];
+	prettify(tmp, BX_COUNTOF(tmp), 4000, bx::Units::Kilo);
+	REQUIRE(0 == bx::strCmp(tmp, "4.00 kB") );
+
+	prettify(tmp, BX_COUNTOF(tmp), 4096, bx::Units::Kibi);
+	REQUIRE(0 == bx::strCmp(tmp, "4.00 KiB") );
+}
 
 TEST_CASE("chars", "")
 {

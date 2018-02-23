@@ -138,7 +138,7 @@ extern "C" double fabs(double _x)
 
 extern "C" double ldexp(double _x, int _exp)
 {
-	return ldexp(float(_x), _exp);
+	return bx::ldexp(float(_x), _exp);
 }
 
 extern "C" float expf(float _x)
@@ -241,21 +241,21 @@ extern "C" double atof(const char* _str)
 	return result;
 }
 
-extern "C" struct DIR* opendir(const char* dirname)
+extern "C" struct DIR* opendir(const char* _dirname)
 {
-	BX_UNUSED(dirname);
+	BX_UNUSED(_dirname);
 	return NULL;
 }
 
-extern "C" struct dirent* readdir(struct DIR* dirp)
+extern "C" struct dirent* readdir(struct DIR* _dirp)
 {
-	BX_UNUSED(dirp);
+	BX_UNUSED(_dirp);
 	return NULL;
 }
 
-extern "C" int closedir (struct DIR* dirp)
+extern "C" int closedir(struct DIR* _dirp)
 {
-	BX_UNUSED(dirp);
+	BX_UNUSED(_dirp);
 	return 0;
 }
 
@@ -453,6 +453,8 @@ extern "C" int unsetenv(const char* _name)
 	BX_UNUSED(_name);
 	return -1;
 }
+
+typedef int64_t time_t;
 
 extern "C" time_t time(time_t* _arg)
 {
