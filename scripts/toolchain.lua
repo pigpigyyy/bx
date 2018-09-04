@@ -730,7 +730,6 @@ function toolchain(_buildDir, _libDir)
 --			"-Wduplicated-branches",
 --			"-Wduplicated-cond",
 --			"-Wjump-misses-init",
-			"-Wlogical-op",
 			"-Wshadow",
 --			"-Wnull-dereference",
 			"-Wunused-value",
@@ -747,6 +746,11 @@ function toolchain(_buildDir, _libDir)
 		linkoptions {
 			"-Wl,--gc-sections",
 			"-Wl,--as-needed",
+		}
+
+	configuration { "linux-gcc*" }
+		buildoptions {
+			"-Wlogical-op",
 		}
 
 	configuration { "linux-gcc*", "x32" }
