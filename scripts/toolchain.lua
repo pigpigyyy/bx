@@ -50,7 +50,6 @@ function toolchain(_buildDir, _libDir)
 		description = "Choose GCC flavor",
 		allowed = {
 			{ "android-arm",     "Android - ARM"              },
-			{ "android-mips",    "Android - MIPS"             },
 			{ "android-x86",     "Android - x86"              },
 			{ "asmjs",           "Emscripten/asm.js"          },
 			{ "freebsd",         "FreeBSD"                    },
@@ -214,35 +213,21 @@ function toolchain(_buildDir, _libDir)
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
 			premake.gcc.cxx  = "$(ANDROID_NDK_CLANG)/bin/clang++"
-			premake.gcc.ar = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
+			premake.gcc.ar   = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
+
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-android-arm"))
-
-		elseif "android-mips" == _OPTIONS["gcc"] then
-
-			if not os.getenv("ANDROID_NDK_MIPS")
-			or not os.getenv("ANDROID_NDK_CLANG")
-			or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT environment variables.")
-			end
-
-			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
-			premake.gcc.cxx  = "$(ANDROID_NDK_CLANG)/bin/clang++"
-			premake.gcc.ar = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
-			premake.gcc.llvm = true
-			location (path.join(_buildDir, "projects", _ACTION .. "-android-mips"))
 
 		elseif "android-x86" == _OPTIONS["gcc"] then
 
 			if not os.getenv("ANDROID_NDK_X86")
 			or not os.getenv("ANDROID_NDK_CLANG")
 			or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT environment variables.")
+				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_X86, and ANDROID_NDK_ROOT environment variables.")
 			end
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
 			premake.gcc.cxx  = "$(ANDROID_NDK_CLANG)/bin/clang++"
-			premake.gcc.ar = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-android-x86"))
 
@@ -649,7 +634,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
@@ -738,7 +723,7 @@ function toolchain(_buildDir, _libDir)
 --			"-Wuseless-cast",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		links {
 			"rt",
@@ -795,7 +780,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		links {
 			"rt",
@@ -814,7 +799,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		links {
 			"rt",
@@ -831,8 +816,8 @@ function toolchain(_buildDir, _libDir)
 		}
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
+			"${ANDROID_NDK_ROOT}/sysroot/usr/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
-			"$(ANDROID_NDK_ROOT)/sysroot/usr/include",
 		}
 		linkoptions {
 			"-nostdlib",
@@ -843,7 +828,7 @@ function toolchain(_buildDir, _libDir)
 			"m",
 			"android",
 			"log",
-			"c++",
+			"c++_shared",
 			"gcc",
 		}
 		buildoptions {
@@ -856,7 +841,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		linkoptions {
 			"-no-canonical-prefixes",
@@ -875,7 +860,7 @@ function toolchain(_buildDir, _libDir)
 			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
 		}
 		buildoptions {
-			"-std=c++11",
+			"-std=c++14",
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
@@ -894,12 +879,9 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "android-arm/bin"))
 		objdir (path.join(_buildDir, "android-arm/obj"))
 		libdirs {
-			path.join(_libDir, "lib/android-arm"),
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/include",
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
 			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/arm-linux-androideabi",
 		}
 		buildoptions {
@@ -923,43 +905,13 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,--fix-cortex-a8",
 		}
 
-	configuration { "android-mips" }
-		targetdir (path.join(_buildDir, "android-mips/bin"))
-		objdir (path.join(_buildDir, "android-mips/obj"))
-		libdirs {
-			path.join(_libDir, "lib/android-mips"),
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips",
-		}
-		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips/include",
-			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/mipsel-linux-android",
-		}
-		buildoptions {
-			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
-			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-mips"),
-			"-target mipsel-none-linux-android",
-			"-mips32",
-			"-Wunused-value",
-			"-Wundef",
-		}
-		linkoptions {
-			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
-			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-mips"),
-			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-mips/usr/lib/crtbegin_so.o"),
-			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-mips/usr/lib/crtend_so.o"),
-			"-target mipsel-none-linux-android",
-			"-mips32",
-		}
-
 	configuration { "android-x86" }
 		targetdir (path.join(_buildDir, "android-x86/bin"))
 		objdir (path.join(_buildDir, "android-x86/obj"))
 		libdirs {
-			path.join(_libDir, "lib/android-x86"),
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86/include",
 			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/x86_64-linux-android",
 		}
 		buildoptions {
@@ -994,7 +946,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 
 	configuration { "freebsd" }
@@ -1036,7 +988,6 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "osx32_clang/bin"))
 		objdir (path.join(_buildDir, "osx32_clang/obj"))
 		--libdirs { path.join(_libDir, "lib/osx32_clang") }
-		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		buildoptions {
 			"-m32",
 		}
@@ -1045,7 +996,6 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "osx64_clang/bin"))
 		objdir (path.join(_buildDir, "osx64_clang/obj"))
 		--libdirs { path.join(_libDir, "lib/osx64_clang") }
-		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		buildoptions {
 			"-m64",
 		}
@@ -1053,14 +1003,13 @@ function toolchain(_buildDir, _libDir)
 	configuration { "osx", "Universal" }
 		targetdir (path.join(_buildDir, "osx_universal/bin"))
 		objdir (path.join(_buildDir, "osx_universal/bin"))
-		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 
 	configuration { "osx" }
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		buildoptions_objcpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		buildoptions {
 			"-Wfatal-errors",
@@ -1075,10 +1024,10 @@ function toolchain(_buildDir, _libDir)
 			"-lc++",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		buildoptions_objcpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		buildoptions {
 			"-Wfatal-errors",
@@ -1114,7 +1063,6 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "ios-arm*" }
-		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		linkoptions {
 			"-miphoneos-version-min=7.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
@@ -1131,10 +1079,9 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "ios-simulator/bin"))
 		objdir (path.join(_buildDir, "ios-simulator/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator") }
-		defines { "BGFX_CONFIG_RENDERER_OPENGLES=1", }
 		linkoptions {
 			"-mios-simulator-version-min=7.0",
-			"-arch x86_64",
+			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/Frameworks",
@@ -1142,7 +1089,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"-mios-simulator-version-min=7.0",
-			"-arch x86_64",
+			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
 
@@ -1150,7 +1097,6 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "ios-simulator64/bin"))
 		objdir (path.join(_buildDir, "ios-simulator64/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator64") }
-		defines { "BGFX_CONFIG_RENDERER_OPENGLES=1", }
 		linkoptions {
 			"-mios-simulator-version-min=7.0",
 			"-arch x86_64",
@@ -1226,7 +1172,7 @@ function toolchain(_buildDir, _libDir)
 			"$(SCE_ORBIS_SDK_DIR)/target/include_common",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 
 	configuration { "rpi" }
@@ -1245,7 +1191,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		includedirs {
 			"/opt/vc/include",
@@ -1277,7 +1223,7 @@ function toolchain(_buildDir, _libDir)
 			"--sysroot=$(FREEDOM_E_SDK)/work/build/riscv-gnu-toolchain/riscv64-unknown-elf/prefix/riscv64-unknown-elf",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 
 	configuration {} -- reset configuration
@@ -1291,12 +1237,6 @@ function strip()
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) $(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-strip -s \"$(TARGET)\""
-		}
-
-	configuration { "android-mips", "Release" }
-		postbuildcommands {
-			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) $(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-strip -s \"$(TARGET)\""
 		}
 
 	configuration { "android-x86", "Release" }
