@@ -989,6 +989,7 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "osx32_clang/bin"))
 		objdir (path.join(_buildDir, "osx32_clang/obj"))
 		--libdirs { path.join(_libDir, "lib/osx32_clang") }
+		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		buildoptions {
 			"-m32",
 		}
@@ -997,6 +998,7 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "osx64_clang/bin"))
 		objdir (path.join(_buildDir, "osx64_clang/obj"))
 		--libdirs { path.join(_libDir, "lib/osx64_clang") }
+		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		buildoptions {
 			"-m64",
 		}
@@ -1004,6 +1006,7 @@ function toolchain(_buildDir, _libDir)
 	configuration { "osx", "Universal" }
 		targetdir (path.join(_buildDir, "osx_universal/bin"))
 		objdir (path.join(_buildDir, "osx_universal/bin"))
+		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 
 	configuration { "osx" }
 		buildoptions_cpp {
@@ -1064,6 +1067,7 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "ios-arm*" }
+		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		linkoptions {
 			"-miphoneos-version-min=7.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
@@ -1080,6 +1084,7 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "ios-simulator/bin"))
 		objdir (path.join(_buildDir, "ios-simulator/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator") }
+		defines { "BGFX_CONFIG_RENDERER_OPENGLES=1", }
 		linkoptions {
 			"-mios-simulator-version-min=7.0",
 			"-arch i386",
@@ -1098,6 +1103,7 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "ios-simulator64/bin"))
 		objdir (path.join(_buildDir, "ios-simulator64/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator64") }
+		defines { "BGFX_CONFIG_RENDERER_OPENGLES=1", }
 		linkoptions {
 			"-mios-simulator-version-min=7.0",
 			"-arch x86_64",
