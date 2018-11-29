@@ -23,25 +23,25 @@ namespace bx
 		return _rad * 180.0f / kPi;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t floatToBits(float _a)
+	inline BX_CONST_FUNC uint32_t floatToBits(float _a)
 	{
 		union { float f; uint32_t ui; } u = { _a };
 		return u.ui;
 	}
 
-	inline constexpr BX_CONST_FUNC float bitsToFloat(uint32_t _a)
+	inline BX_CONST_FUNC float bitsToFloat(uint32_t _a)
 	{
 		union { uint32_t ui; float f; } u = { _a };
 		return u.f;
 	}
 
-	inline constexpr BX_CONST_FUNC uint64_t doubleToBits(double _a)
+	inline BX_CONST_FUNC uint64_t doubleToBits(double _a)
 	{
 		union { double f; uint64_t ui; } u = { _a };
 		return u.ui;
 	}
 
-	inline constexpr BX_CONST_FUNC double bitsToDouble(uint64_t _a)
+	inline BX_CONST_FUNC double bitsToDouble(uint64_t _a)
 	{
 		union { uint64_t ui; double f; } u = { _a };
 		return u.f;
@@ -49,8 +49,9 @@ namespace bx
 
 	inline BX_CONST_FUNC uint32_t floatFlip(uint32_t _value)
 	{
-		// Reference:
-		// http://archive.fo/2012.12.08-212402/http://stereopsis.com/radix.html
+		// Reference(s):
+		// - http://archive.fo/2012.12.08-212402/http://stereopsis.com/radix.html
+		//
 		const uint32_t tmp0   = uint32_sra(_value, 31);
 		const uint32_t tmp1   = uint32_neg(tmp0);
 		const uint32_t mask   = uint32_or(tmp1, 0x80000000);
@@ -58,37 +59,37 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC bool isNan(float _f)
+	inline BX_CONST_FUNC bool isNan(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp > UINT32_C(0x7f800000);
 	}
 
-	inline constexpr BX_CONST_FUNC bool isNan(double _f)
+	inline BX_CONST_FUNC bool isNan(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp > UINT64_C(0x7ff0000000000000);
 	}
 
-	inline constexpr BX_CONST_FUNC bool isFinite(float _f)
+	inline BX_CONST_FUNC bool isFinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp < UINT32_C(0x7f800000);
 	}
 
-	inline constexpr BX_CONST_FUNC bool isFinite(double _f)
+	inline BX_CONST_FUNC bool isFinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp < UINT64_C(0x7ff0000000000000);
 	}
 
-	inline constexpr BX_CONST_FUNC bool isInfinite(float _f)
+	inline BX_CONST_FUNC bool isInfinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp == UINT32_C(0x7f800000);
 	}
 
-	inline constexpr BX_CONST_FUNC bool isInfinite(double _f)
+	inline BX_CONST_FUNC bool isInfinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp == UINT64_C(0x7ff0000000000000);
@@ -104,22 +105,22 @@ namespace bx
 		return -floor(-_a);
 	}
 
-	inline constexpr BX_CONST_FUNC float lerp(float _a, float _b, float _t)
+	inline BX_CONSTEXPR_FUNC float lerp(float _a, float _b, float _t)
 	{
 		return _a + (_b - _a) * _t;
 	}
 
-	inline constexpr BX_CONST_FUNC float sign(float _a)
+	inline BX_CONSTEXPR_FUNC float sign(float _a)
 	{
 		return _a < 0.0f ? -1.0f : 1.0f;
 	}
 
-	inline constexpr BX_CONST_FUNC float abs(float _a)
+	inline BX_CONSTEXPR_FUNC float abs(float _a)
 	{
 		return _a < 0.0f ? -_a : _a;
 	}
 
-	inline constexpr BX_CONST_FUNC float square(float _a)
+	inline BX_CONSTEXPR_FUNC float square(float _a)
 	{
 		return _a * _a;
 	}
@@ -237,17 +238,17 @@ namespace bx
 #endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
-	inline constexpr BX_CONST_FUNC float trunc(float _a)
+	inline BX_CONSTEXPR_FUNC float trunc(float _a)
 	{
 		return float(int(_a) );
 	}
 
-	inline constexpr BX_CONST_FUNC float fract(float _a)
+	inline BX_CONSTEXPR_FUNC float fract(float _a)
 	{
 		return _a - trunc(_a);
 	}
 
-	inline constexpr BX_CONST_FUNC float mad(float _a, float _b, float _c)
+	inline BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c)
 	{
 		return _a * _b + _c;
 	}
@@ -257,10 +258,11 @@ namespace bx
 		return _a - _b * floor(_a / _b);
 	}
 
-	inline constexpr BX_CONST_FUNC bool equal(float _a, float _b, float _epsilon)
+	inline BX_CONSTEXPR_FUNC bool equal(float _a, float _b, float _epsilon)
 	{
-		// Reference:
-		// https://web.archive.org/web/20181103180318/http://realtimecollisiondetection.net/blog/?p=89
+		// Reference(s):
+		// - https://web.archive.org/web/20181103180318/http://realtimecollisiondetection.net/blog/?p=89
+		//
 		const float lhs = abs(_a - _b);
 		const float rhs = _epsilon * max(1.0f, abs(_a), abs(_b) );
 		return lhs <= rhs;
@@ -283,28 +285,33 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC float step(float _edge, float _a)
+	inline BX_CONSTEXPR_FUNC float step(float _edge, float _a)
 	{
 		return _a < _edge ? 0.0f : 1.0f;
 	}
 
-	inline constexpr BX_CONST_FUNC float pulse(float _a, float _start, float _end)
+	inline BX_CONSTEXPR_FUNC float pulse(float _a, float _start, float _end)
 	{
 		return step(_a, _start) - step(_a, _end);
 	}
 
-	inline constexpr BX_CONST_FUNC float smoothStep(float _a)
+	inline BX_CONSTEXPR_FUNC float smoothStep(float _a)
 	{
 		return square(_a)*(3.0f - 2.0f*_a);
 	}
 
-	inline constexpr BX_CONST_FUNC float bias(float _time, float _bias)
+	inline BX_CONSTEXPR_FUNC float bias(float _time, float _bias)
 	{
 		return _time / ( ( (1.0f/_bias - 2.0f)*(1.0f - _time) ) + 1.0f);
 	}
 
-	inline constexpr BX_CONST_FUNC float gain(float _time, float _gain)
+	inline BX_CONSTEXPR_FUNC float gain(float _time, float _gain)
 	{
+		// Reference(s):
+		// - Bias And Gain Are Your Friend
+		//   https://web.archive.org/web/20181126040535/https://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
+		//   https://web.archive.org/web/20181126040558/http://demofox.org/biasgain.html
+		//
 		if (_time < 0.5f)
 		{
 			return bias(_time * 2.0f, _gain) * 0.5f;
@@ -343,7 +350,7 @@ namespace bx
 		ptr[2] = _a.z;
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 abs(const Vec3&  _a)
+	inline BX_CONSTEXPR_FUNC Vec3 abs(const Vec3&  _a)
 	{
 		return
 		{
@@ -353,7 +360,7 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 neg(const Vec3&  _a)
+	inline BX_CONSTEXPR_FUNC Vec3 neg(const Vec3&  _a)
 	{
 		return
 		{
@@ -363,7 +370,7 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 add(const Vec3&  _a, const Vec3&  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 add(const Vec3&  _a, const Vec3&  _b)
 	{
 		return
 		{
@@ -373,7 +380,7 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 add(const Vec3&  _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 add(const Vec3&  _a, float _b)
 	{
 		return
 		{
@@ -383,7 +390,7 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 sub(const Vec3&  _a, const Vec3&  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 sub(const Vec3&  _a, const Vec3&  _b)
 	{
 		return
 		{
@@ -393,7 +400,7 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 sub(const Vec3&  _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 sub(const Vec3&  _a, float _b)
 	{
 		return
 		{
@@ -403,7 +410,7 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 mul(const Vec3&  _a, const Vec3&  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3&  _a, const Vec3&  _b)
 	{
 		return
 		{
@@ -413,7 +420,7 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 mul(const Vec3&  _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3&  _a, float _b)
 	{
 		return
 		{
@@ -423,17 +430,17 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 mad(const Vec3& _a, const Vec3& _b, const Vec3& _c)
+	inline BX_CONSTEXPR_FUNC Vec3 mad(const Vec3& _a, const Vec3& _b, const Vec3& _c)
 	{
 		return add(mul(_a, _b), _c);
 	}
 
-	inline constexpr BX_CONST_FUNC float dot(const Vec3&  _a, const Vec3&  _b)
+	inline BX_CONSTEXPR_FUNC float dot(const Vec3&  _a, const Vec3&  _b)
 	{
 		return _a.x*_b.x + _a.y*_b.y + _a.z*_b.z;
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 cross(const Vec3&  _a, const Vec3&  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 cross(const Vec3&  _a, const Vec3&  _b)
 	{
 		return
 		{
@@ -448,7 +455,7 @@ namespace bx
 		return sqrt(dot(_a, _a) );
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, float _t)
+	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, float _t)
 	{
 		return
 		{
@@ -458,7 +465,7 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, const Vec3&  _t)
+	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, const Vec3&  _t)
 	{
 		return
 		{
@@ -475,7 +482,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 min(const Vec3&  _a, const Vec3&  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 min(const Vec3&  _a, const Vec3&  _b)
 	{
 		return
 		{
@@ -485,7 +492,7 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 max(const Vec3&  _a, const Vec3&  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 max(const Vec3&  _a, const Vec3&  _b)
 	{
 		return
 		{
@@ -495,7 +502,7 @@ namespace bx
 		};
 	}
 
-	inline constexpr BX_CONST_FUNC Vec3 rcp(const Vec3&  _a)
+	inline BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3&  _a)
 	{
 		return
 		{

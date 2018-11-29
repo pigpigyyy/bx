@@ -68,19 +68,19 @@ namespace bx
 
 	/// Reinterprets the bit pattern of _a as uint32_t.
 	///
-	constexpr BX_CONST_FUNC uint32_t floatToBits(float _a);
+	BX_CONST_FUNC uint32_t floatToBits(float _a);
 
 	/// Reinterprets the bit pattern of _a as float.
 	///
-	constexpr BX_CONST_FUNC float bitsToFloat(uint32_t _a);
+	BX_CONST_FUNC float bitsToFloat(uint32_t _a);
 
 	/// Reinterprets the bit pattern of _a as uint64_t.
 	///
-	constexpr BX_CONST_FUNC uint64_t doubleToBits(double _a);
+	BX_CONST_FUNC uint64_t doubleToBits(double _a);
 
 	/// Reinterprets the bit pattern of _a as double.
 	///
-	constexpr BX_CONST_FUNC double bitsToDouble(uint64_t _a);
+	BX_CONST_FUNC double bitsToDouble(uint64_t _a);
 
 	/// Returns sortable floating point value.
 	///
@@ -88,27 +88,27 @@ namespace bx
 
 	/// Returns true if _f is a number that is NaN.
 	///
-	constexpr BX_CONST_FUNC bool isNan(float _f);
+	BX_CONST_FUNC bool isNan(float _f);
 
 	/// Returns true if _f is a number that is NaN.
 	///
-	constexpr BX_CONST_FUNC bool isNan(double _f);
+	BX_CONST_FUNC bool isNan(double _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
 	///
-	constexpr BX_CONST_FUNC bool isFinite(float _f);
+	BX_CONST_FUNC bool isFinite(float _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
 	///
-	constexpr BX_CONST_FUNC bool isFinite(double _f);
+	BX_CONST_FUNC bool isFinite(double _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
 	///
-	constexpr BX_CONST_FUNC bool isInfinite(float _f);
+	BX_CONST_FUNC bool isInfinite(float _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
 	///
-	constexpr BX_CONST_FUNC bool isInfinite(double _f);
+	BX_CONST_FUNC bool isInfinite(double _f);
 
 	/// Returns the largest integer value not greater than _f.
 	///
@@ -124,19 +124,19 @@ namespace bx
 
 	/// Returns linear interpolation between two values _a and _b.
 	///
-	constexpr BX_CONST_FUNC float lerp(float _a, float _b, float _t);
+	BX_CONSTEXPR_FUNC float lerp(float _a, float _b, float _t);
 
 	/// Returns the sign of _a.
 	///
-	constexpr BX_CONST_FUNC float sign(float _a);
+	BX_CONSTEXPR_FUNC float sign(float _a);
 
 	/// Returns the absolute of _a.
 	///
-	constexpr BX_CONST_FUNC float abs(float _a);
+	BX_CONSTEXPR_FUNC float abs(float _a);
 
 	/// Returns the square of _a.
 	///
-	constexpr BX_CONST_FUNC float square(float _a);
+	BX_CONSTEXPR_FUNC float square(float _a);
 
 	/// Returns the cosine of the argument _a.
 	///
@@ -217,23 +217,23 @@ namespace bx
 
 	/// Returns the nearest integer not greater in magnitude than _a.
 	///
-	constexpr BX_CONST_FUNC float trunc(float _a);
+	BX_CONSTEXPR_FUNC float trunc(float _a);
 
 	/// Returns the fractional (or decimal) part of _a, which is greater than or equal to 0
 	/// and less than 1.
 	///
-	constexpr BX_CONST_FUNC float fract(float _a);
+	BX_CONSTEXPR_FUNC float fract(float _a);
 
 	/// Returns result of multipla and add (_a * _b + _c).
 	///
-	constexpr BX_CONST_FUNC float mad(float _a, float _b, float _c);
+	BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c);
 
 	/// Returns the floating-point remainder of the division operation _a/_b.
 	///
 	BX_CONST_FUNC float mod(float _a, float _b);
 
 	///
-	constexpr BX_CONST_FUNC bool equal(float _a, float _b, float _epsilon);
+	BX_CONSTEXPR_FUNC bool equal(float _a, float _b, float _epsilon);
 
 	///
 	BX_CONST_FUNC bool equal(const float* _a, const float* _b, uint32_t _num, float _epsilon);
@@ -242,23 +242,19 @@ namespace bx
 	BX_CONST_FUNC float wrap(float _a, float _wrap);
 
 	///
-	constexpr BX_CONST_FUNC float step(float _edge, float _a);
+	BX_CONSTEXPR_FUNC float step(float _edge, float _a);
 
 	///
-	constexpr BX_CONST_FUNC float pulse(float _a, float _start, float _end);
+	BX_CONSTEXPR_FUNC float pulse(float _a, float _start, float _end);
 
 	///
-	constexpr BX_CONST_FUNC float smoothStep(float _a);
-
-	// References:
-	//  - Bias And Gain Are Your Friend
-	//    http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
-	//  - http://demofox.org/biasgain.html
-	///
-	constexpr BX_CONST_FUNC float bias(float _time, float _bias);
+	BX_CONSTEXPR_FUNC float smoothStep(float _a);
 
 	///
-	constexpr BX_CONST_FUNC float gain(float _time, float _gain);
+	BX_CONSTEXPR_FUNC float bias(float _time, float _bias);
+
+	///
+	BX_CONSTEXPR_FUNC float gain(float _time, float _gain);
 
 	///
 	BX_CONST_FUNC float angleDiff(float _a, float _b);
@@ -274,58 +270,58 @@ namespace bx
 	void store(void* _ptr, const Vec3& _a);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 abs(const Vec3&  _a);
+	BX_CONSTEXPR_FUNC Vec3 abs(const Vec3&  _a);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 neg(const Vec3&  _a);
+	BX_CONSTEXPR_FUNC Vec3 neg(const Vec3&  _a);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 add(const Vec3&  _a, const Vec3&  _b);
+	BX_CONSTEXPR_FUNC Vec3 add(const Vec3&  _a, const Vec3&  _b);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 add(const Vec3&  _a, float _b);
+	BX_CONSTEXPR_FUNC Vec3 add(const Vec3&  _a, float _b);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 sub(const Vec3&  _a, const Vec3&  _b);
+	BX_CONSTEXPR_FUNC Vec3 sub(const Vec3&  _a, const Vec3&  _b);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 sub(const Vec3&  _a, float _b);
+	BX_CONSTEXPR_FUNC Vec3 sub(const Vec3&  _a, float _b);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 mul(const Vec3&  _a, const Vec3&  _b);
+	BX_CONSTEXPR_FUNC Vec3 mul(const Vec3&  _a, const Vec3&  _b);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 mul(const Vec3&  _a, float _b);
+	BX_CONSTEXPR_FUNC Vec3 mul(const Vec3&  _a, float _b);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 mad(const Vec3& _a, const Vec3& _b, const Vec3& _c);
+	BX_CONSTEXPR_FUNC Vec3 mad(const Vec3& _a, const Vec3& _b, const Vec3& _c);
 
 	///
-	constexpr BX_CONST_FUNC float dot(const Vec3&  _a, const Vec3&  _b);
+	BX_CONSTEXPR_FUNC float dot(const Vec3&  _a, const Vec3&  _b);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 cross(const Vec3&  _a, const Vec3&  _b);
+	BX_CONSTEXPR_FUNC Vec3 cross(const Vec3&  _a, const Vec3&  _b);
 
 	///
 	BX_CONST_FUNC float length(const Vec3&  _a);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, float _t);
+	BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, float _t);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, const Vec3&  _t);
+	BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, const Vec3&  _t);
 
 	///
 	BX_CONST_FUNC Vec3 normalize(const Vec3&  _a);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 min(const Vec3&  _a, const Vec3&  _b);
+	BX_CONSTEXPR_FUNC Vec3 min(const Vec3&  _a, const Vec3&  _b);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 max(const Vec3&  _a, const Vec3&  _b);
+	BX_CONSTEXPR_FUNC Vec3 max(const Vec3&  _a, const Vec3&  _b);
 
 	///
-	constexpr BX_CONST_FUNC Vec3 rcp(const Vec3&  _a);
+	BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3&  _a);
 
 	///
 	void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3& _n);
