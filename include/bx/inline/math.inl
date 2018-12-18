@@ -787,9 +787,45 @@ namespace bx
 		_result[2] = _a[2] - _b[2];
 	}
 
+	inline void vec3Mul(float* _result, const float* _a, const float* _b)
+	{
+		_result[0] = _a[0] * _b[0];
+		_result[1] = _a[1] * _b[1];
+		_result[2] = _a[2] * _b[2];
+	}
+
+	inline void vec3Mul(float* _result, const float* _a, float _b)
+	{
+		_result[0] = _a[0] * _b;
+		_result[1] = _a[1] * _b;
+		_result[2] = _a[2] * _b;
+	}
+
 	inline float vec3Dot(const float* _a, const float* _b)
 	{
 		return _a[0]*_b[0] + _a[1]*_b[1] + _a[2]*_b[2];
+	}
+
+	inline void vec3Cross(float* _result, const float* _a, const float* _b)
+	{
+		_result[0] = _a[1]*_b[2] - _a[2]*_b[1];
+		_result[1] = _a[2]*_b[0] - _a[0]*_b[2];
+		_result[2] = _a[0]*_b[1] - _a[1]*_b[0];
+	}
+
+	inline float vec3Length(const float* _a)
+	{
+		return sqrt(vec3Dot(_a, _a) );
+	}
+
+	inline float vec3Norm(float* _result, const float* _a)
+	{
+		const float len = vec3Length(_a);
+		const float invLen = 1.0f/len;
+		_result[0] = _a[0] * invLen;
+		_result[1] = _a[1] * invLen;
+		_result[2] = _a[2] * invLen;
+		return len;
 	}
 
 	inline void mtxIdentity(float* _result)
