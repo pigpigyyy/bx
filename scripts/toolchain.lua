@@ -28,6 +28,7 @@ local function crtNone()
 	}
 
 	configuration { "linux-*" }
+		defines { "BGFX_CONFIG_RENDERER_OPENGL_MIN_VERSION=33", "BGFX_CONFIG_RENDERER_OPENGLES_MIN_VERSION=30" }
 
 		buildoptions {
 			"-mpreferred-stack-boundary=4",
@@ -80,6 +81,7 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-riscv64-gcc",  "Linux (RISC-V 64, GCC compiler)"  },
 			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "ios-simulator",   "iOS - Simulator"            },
+			{ "ios-simulator64", "iOS - Simulator 64"         },
 			{ "tvos-arm64",      "tvOS - ARM64"               },
 			{ "xros-arm64",      "visionOS ARM64"             },
 			{ "xros-simulator",  "visionOS - Simulator"       },
@@ -181,7 +183,7 @@ function toolchain(_buildDir, _libDir)
 		os.exit(1)
 	end
 
-	local androidApiLevel = 24
+	local androidApiLevel = 28
 	if _OPTIONS["with-android"] then
 		androidApiLevel = _OPTIONS["with-android"]
 	end
@@ -191,7 +193,7 @@ function toolchain(_buildDir, _libDir)
 		iosPlatform = _OPTIONS["with-ios"]
 	end
 
-	local macosPlatform = ""
+	local macosPlatform = "11.3"
 	if _OPTIONS["with-macos"] then
 		macosPlatform = _OPTIONS["with-macos"]
 	end
@@ -274,6 +276,12 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator"))
+
+		elseif "ios-simulator64" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.ar  = "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator64"))
 
 		elseif "tvos-arm64" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
@@ -522,9 +530,14 @@ function toolchain(_buildDir, _libDir)
 			"-Wno-tautological-constant-compare",
 		}
 
+	configuration { "vs*", "Debug" }
+		defines {
+			"_ITERATOR_DEBUG_LEVEL=0",
+		}
+
 	configuration { "vs*", "not NX32", "not NX64" }
 		flags {
-			"EnableAVX",
+			"EnableSSE2",
 		}
 
 	configuration { "vs*", "not orbis", "not NX32", "not NX64" }
@@ -538,6 +551,7 @@ function toolchain(_buildDir, _libDir)
 			"_SCL_SECURE_NO_WARNINGS",
 			"_CRT_SECURE_NO_WARNINGS",
 			"_CRT_SECURE_NO_DEPRECATE",
+			"BGFX_CONFIG_RENDERER_DIRECT3D11=1",
 		}
 		buildoptions {
 			"/wd4201", -- warning C4201: nonstandard extension used: nameless struct/union
@@ -771,6 +785,7 @@ function toolchain(_buildDir, _libDir)
 		flags {
 			"NoImportLib",
 		}
+		defines { "BGFX_CONFIG_RENDERER_OPENGLES=30" }
 		links {
 			"c",
 			"dl",
@@ -949,9 +964,11 @@ function toolchain(_buildDir, _libDir)
 			"-arch arm64",
 			"-Wno-error=unused-command-line-argument",
 			"-Wno-unused-command-line-argument",
+			"-target arm64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "11.3"),
 		}
 
 	configuration { "osx*" }
+		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		buildoptions {
 			"-Wfatal-errors",
 			"-Wunused-value",
@@ -960,6 +977,19 @@ function toolchain(_buildDir, _libDir)
 --			"-mmacosx-version-min=13.0",
 		}
 		includedirs { path.join(bxDir, "include/compat/osx") }
+
+	configuration { "ios*" }
+		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
+		linkoptions {
+			"-lc++",
+		}
+		buildoptions {
+			"-Wfatal-errors",
+			"-Wunused-value",
+			"-Wundef",
+--			"-mios-version-min=16.0",
+		}
+		includedirs { path.join(bxDir, "include/compat/ios") }
 
 	configuration { "xcode*", "ios*" }
 		targetdir (path.join(_buildDir, "ios-arm/bin"))
@@ -1031,12 +1061,34 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "ios-simulator/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator") }
 		linkoptions {
+			"-mios-simulator-version-min=13.0",
+			"-arch arm64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/Frameworks",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
+			"-mios-simulator-version-min=13.0",
+			"-arch arm64",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
+		}
+
+	configuration { "ios-simulator64" }
+		targetdir (path.join(_buildDir, "ios-simulator64/bin"))
+		objdir (path.join(_buildDir, "ios-simulator64/obj"))
+		libdirs { path.join(_libDir, "lib/ios-simulator64") }
+		linkoptions {
+			"-mios-simulator-version-min=13.0",
+			"-arch x86_64",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+		}
+		buildoptions {
+			"-mios-simulator-version-min=13.0",
+			"-arch x86_64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
 
