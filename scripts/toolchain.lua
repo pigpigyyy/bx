@@ -561,6 +561,7 @@ function toolchain(_buildDir, _libDir)
 			"_SCL_SECURE_NO_WARNINGS",
 			"_CRT_SECURE_NO_WARNINGS",
 			"_CRT_SECURE_NO_DEPRECATE",
+			"_ITERATOR_DEBUG_LEVEL=0"
 		}
 		buildoptions {
 			"/wd4201", -- warning C4201: nonstandard extension used: nameless struct/union
