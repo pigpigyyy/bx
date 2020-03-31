@@ -818,6 +818,7 @@ function toolchain(_buildDir, _libDir)
 			"${ANDROID_NDK_ROOT}/sysroot/usr/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
+		defines { "BGFX_CONFIG_RENDERER_OPENGLES=1", }
 		linkoptions {
 			"-nostdlib",
 		}
