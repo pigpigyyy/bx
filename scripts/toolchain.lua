@@ -553,7 +553,8 @@ function toolchain(_buildDir, _libDir)
 			"_SCL_SECURE_NO_WARNINGS",
 			"_CRT_SECURE_NO_WARNINGS",
 			"_CRT_SECURE_NO_DEPRECATE",
-			"_ITERATOR_DEBUG_LEVEL=0"
+			"_ITERATOR_DEBUG_LEVEL=0",
+			"BGFX_CONFIG_RENDERER_DIRECT3D12=1"
 		}
 		buildoptions {
 			"/wd4201", -- warning C4201: nonstandard extension used: nameless struct/union
