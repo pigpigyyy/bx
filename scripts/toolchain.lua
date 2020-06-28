@@ -877,7 +877,6 @@ function toolchain(_buildDir, _libDir)
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm/usr/lib/crtend_so.o"),
 			"-target armv7-none-linux-androideabi",
 			"-march=armv7-a",
-			"-Wl,--fix-cortex-a8",
 		}
 
 	configuration { "android-arm64" }
@@ -904,7 +903,6 @@ function toolchain(_buildDir, _libDir)
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm64/usr/lib/crtend_so.o"),
 			"-target aarch64-none-linux-androideabi",
 			"-march=armv8-a",
-			"-Wl,--fix-cortex-a8",
 		}
 
 	configuration { "android-x86" }
@@ -1067,14 +1065,14 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "ios-arm*" }
 		linkoptions {
-			"-miphoneos-version-min=7.0",
+			"-miphoneos-version-min=9.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/Frameworks",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"-miphoneos-version-min=7.0",
+			"-miphoneos-version-min=9.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-fembed-bitcode",
 		}
@@ -1084,7 +1082,7 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "ios-simulator/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator") }
 		linkoptions {
-			"-mios-simulator-version-min=7.0",
+			"-mios-simulator-version-min=9.0",
 			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
@@ -1092,7 +1090,7 @@ function toolchain(_buildDir, _libDir)
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"-mios-simulator-version-min=7.0",
+			"-mios-simulator-version-min=9.0",
 			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
@@ -1102,7 +1100,7 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "ios-simulator64/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator64") }
 		linkoptions {
-			"-mios-simulator-version-min=7.0",
+			"-mios-simulator-version-min=9.0",
 			"-arch x86_64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
@@ -1110,7 +1108,7 @@ function toolchain(_buildDir, _libDir)
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"-mios-simulator-version-min=7.0",
+			"-mios-simulator-version-min=9.0",
 			"-arch x86_64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
