@@ -248,7 +248,7 @@ function toolchain(_buildDir, _libDir)
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
 			premake.gcc.cxx  = "$(ANDROID_NDK_CLANG)/bin/clang++"
-			premake.gcc.ar = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
+			premake.gcc.ar   = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-android-x86"))
 
@@ -463,9 +463,7 @@ function toolchain(_buildDir, _libDir)
 
 		end
 
-	elseif _ACTION == "xcode4"
-		or _ACTION == "xcode8"
-		or _ACTION == "xcode9" then
+	elseif _ACTION and _ACTION:match("^xcode.+$") then
 		local action = premake.action.current()
 		local str_or = function(str, def)
 			return #str > 0 and str or def
@@ -996,7 +994,6 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "osx32_clang/bin"))
 		objdir (path.join(_buildDir, "osx32_clang/obj"))
 		--libdirs { path.join(_libDir, "lib/osx32_clang") }
-		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		buildoptions {
 			"-m32",
 		}
@@ -1005,17 +1002,20 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "osx64_clang/bin"))
 		objdir (path.join(_buildDir, "osx64_clang/obj"))
 		--libdirs { path.join(_libDir, "lib/osx64_clang") }
-		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		buildoptions {
 			"-m64",
 		}
 
 	configuration { "osx", "Universal" }
 		targetdir (path.join(_buildDir, "osx_universal/bin"))
-		objdir (path.join(_buildDir, "osx_universal/bin"))
-		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
+		objdir (path.join(_buildDir, "osx_universal/obj"))
+
+	configuration { "osx", "Native" }
+		targetdir (path.join(_buildDir, "osx/bin"))
+		objdir (path.join(_buildDir, "osx/obj"))
 
 	configuration { "osx" }
+		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		buildoptions {
 			"-Wfatal-errors",
 			"-msse2",
