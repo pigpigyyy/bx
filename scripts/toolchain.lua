@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2020 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2021 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
@@ -52,7 +52,8 @@ function toolchain(_buildDir, _libDir)
 			{ "android-arm",     "Android - ARM"              },
 			{ "android-arm64",   "Android - ARM64"            },
 			{ "android-x86",     "Android - x86"              },
-			{ "asmjs",           "Emscripten/asm.js"          },
+			{ "wasm2js",         "Emscripten/Wasm2JS"         },
+			{ "wasm",            "Emscripten/Wasm"            },
 			{ "freebsd",         "FreeBSD"                    },
 			{ "linux-gcc",       "Linux (GCC compiler)"       },
 			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
@@ -70,11 +71,11 @@ function toolchain(_buildDir, _libDir)
 			{ "mingw-gcc",       "MinGW"                      },
 			{ "mingw-clang",     "MinGW (clang compiler)"     },
 			{ "netbsd",          "NetBSD"                     },
-			{ "osx",             "OSX"                        },
+			{ "osx-x64",         "OSX - x64"                  },
+			{ "osx-arm64",       "OSX - ARM64"                },
 			{ "orbis",           "Orbis"                      },
 			{ "riscv",           "RISC-V"                     },
 			{ "rpi",             "RaspberryPi"                },
-			{ "haiku",           "Haiku"                      },
 		},
 	}
 
@@ -251,10 +252,10 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-android-x86"))
 
-		elseif "asmjs" == _OPTIONS["gcc"] then
+		elseif "wasm2js" == _OPTIONS["gcc"] or "wasm" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
-				print("Set EMSCRIPTEN environment variable.")
+				print("Set EMSCRIPTEN environment variable to root directory of your Emscripten installation. (e.g. by entering the EMSDK command prompt)")
 			end
 
 			premake.gcc.cc   = "\"$(EMSCRIPTEN)/emcc\""
@@ -262,7 +263,7 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar   = "\"$(EMSCRIPTEN)/emar\""
 			premake.gcc.llvm = true
 			premake.gcc.namestyle = "Emscripten"
-			location (path.join(_buildDir, "projects", _ACTION .. "-asmjs"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
 		elseif "freebsd" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-freebsd"))
@@ -361,7 +362,9 @@ function toolchain(_buildDir, _libDir)
 		elseif "netbsd" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-netbsd"))
 
-		elseif "osx" == _OPTIONS["gcc"] then
+		elseif "osx-x64"   == _OPTIONS["gcc"]
+			or "osx-arm64" == _OPTIONS["gcc"] then
+
 
 			if os.is("linux") then
 				if not os.getenv("OSXCROSS") then
@@ -373,7 +376,8 @@ function toolchain(_buildDir, _libDir)
 				premake.gcc.cxx = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "clang++"
 				premake.gcc.ar  = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "ar"
 			end
-			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
+
+			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
 		elseif "orbis" == _OPTIONS["gcc"] then
 
@@ -462,9 +466,7 @@ function toolchain(_buildDir, _libDir)
 
 		end
 
-	elseif _ACTION == "xcode4"
-		or _ACTION == "xcode8"
-		or _ACTION == "xcode9" then
+	elseif _ACTION and _ACTION:match("^xcode.+$") then
 		local action = premake.action.current()
 		local str_or = function(str, def)
 			return #str > 0 and str or def
@@ -552,8 +554,6 @@ function toolchain(_buildDir, _libDir)
 			"_SCL_SECURE_NO_WARNINGS",
 			"_CRT_SECURE_NO_WARNINGS",
 			"_CRT_SECURE_NO_DEPRECATE",
-			"BGFX_CONFIG_RENDERER_DIRECT3D11=1",
-			"_ITERATOR_DEBUG_LEVEL=0"
 		}
 		buildoptions {
 			"/wd4201", -- warning C4201: nonstandard extension used: nameless struct/union
@@ -819,7 +819,6 @@ function toolchain(_buildDir, _libDir)
 			"${ANDROID_NDK_ROOT}/sysroot/usr/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
-		defines { "BGFX_CONFIG_RENDERER_OPENGLES=1", }
 		linkoptions {
 			"-nostdlib",
 		}
@@ -876,7 +875,6 @@ function toolchain(_buildDir, _libDir)
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm/usr/lib/crtend_so.o"),
 			"-target armv7-none-linux-androideabi",
 			"-march=armv7-a",
-			"-Wl,--fix-cortex-a8",
 		}
 
 	configuration { "android-arm64" }
@@ -903,7 +901,6 @@ function toolchain(_buildDir, _libDir)
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm64/usr/lib/crtend_so.o"),
 			"-target aarch64-none-linux-androideabi",
 			"-march=armv8-a",
-			"-Wl,--fix-cortex-a8",
 		}
 
 	configuration { "android-x86" }
@@ -935,21 +932,28 @@ function toolchain(_buildDir, _libDir)
 			"-target i686-none-linux-android",
 		}
 
-	configuration { "asmjs" }
-		targetdir (path.join(_buildDir, "asmjs/bin"))
-		objdir (path.join(_buildDir, "asmjs/obj"))
-		libdirs { path.join(_libDir, "lib/asmjs") }
+	configuration { "wasm*" }
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
 		}
 
 		linkoptions {
---			"-s ASSERTIONS=2",
---			"-s EMTERPRETIFY=1",
---			"-s EMTERPRETIFY_ASYNC=1",
-			"-s PRECISE_F32=1",
+			"-s MAX_WEBGL_VERSION=2"
 		}
+
+	configuration { "wasm2js" }
+		targetdir (path.join(_buildDir, "wasm2js/bin"))
+		objdir (path.join(_buildDir, "wasm2js/obj"))
+		libdirs { path.join(_libDir, "lib/wasm2js") }
+		linkoptions {
+			"-s WASM=0"
+		}
+
+	configuration { "wasm" }
+		targetdir (path.join(_buildDir, "wasm/bin"))
+		objdir (path.join(_buildDir, "wasm/obj"))
+		libdirs { path.join(_libDir, "lib/wasm") }
 
 	configuration { "freebsd" }
 		targetdir (path.join(_buildDir, "freebsd/bin"))
@@ -986,39 +990,39 @@ function toolchain(_buildDir, _libDir)
 			path.join(bxDir, "include/compat/freebsd"),
 		}
 
-	configuration { "osx", "x32" }
-		targetdir (path.join(_buildDir, "osx32_clang/bin"))
-		objdir (path.join(_buildDir, "osx32_clang/obj"))
-		--libdirs { path.join(_libDir, "lib/osx32_clang") }
+	configuration { "osx-x64" }
+		targetdir (path.join(_buildDir, "osx-x64/bin"))
+		objdir (path.join(_buildDir, "osx-x64/obj"))
+		linkoptions {
+			"-arch x86_64",
+		}
 		buildoptions {
-			"-m32",
+			"-arch x86_64",
+			"-msse2",
+			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.11"),
 		}
 
-	configuration { "osx", "x64" }
-		targetdir (path.join(_buildDir, "osx64_clang/bin"))
-		objdir (path.join(_buildDir, "osx64_clang/obj"))
-		--libdirs { path.join(_libDir, "lib/osx64_clang") }
+	configuration { "osx-arm64" }
+		targetdir (path.join(_buildDir, "osx-arm64/bin"))
+		objdir (path.join(_buildDir, "osx-arm64/obj"))
+		linkoptions {
+			"-arch arm64",
+		}
 		buildoptions {
-			"-m64",
+			"-arch arm64",
+			"-Wno-error=unused-command-line-argument",
+			"-Wno-unused-command-line-argument",
 		}
 
-	configuration { "osx", "Universal" }
-		targetdir (path.join(_buildDir, "osx_universal/bin"))
-		objdir (path.join(_buildDir, "osx_universal/bin"))
-
-	configuration { "osx" }
-		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
+	configuration { "osx*" }
 		buildoptions {
 			"-Wfatal-errors",
-			"-msse2",
 			"-Wunused-value",
 			"-Wundef",
-			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.11"),
 		}
 		includedirs { path.join(bxDir, "include/compat/osx") }
 
 	configuration { "ios*" }
-		defines { "BGFX_CONFIG_RENDERER_METAL=1", }
 		linkoptions {
 			"-lc++",
 		}
