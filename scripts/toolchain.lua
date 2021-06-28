@@ -538,6 +538,11 @@ function toolchain(_buildDir, _libDir)
 			"ExtraWarnings",
 		}
 
+	configuration { "vs*", "Debug" }
+		defines {
+			"_ITERATOR_DEBUG_LEVEL=0",
+		}
+
 	configuration { "vs*", "x32" }
 		flags {
 			"EnableSSE2",
@@ -555,7 +560,6 @@ function toolchain(_buildDir, _libDir)
 			"_CRT_SECURE_NO_WARNINGS",
 			"_CRT_SECURE_NO_DEPRECATE",
 			"BGFX_CONFIG_RENDERER_DIRECT3D11=1",
-			"_ITERATOR_DEBUG_LEVEL=0"
 		}
 		buildoptions {
 			"/wd4201", -- warning C4201: nonstandard extension used: nameless struct/union
@@ -818,7 +822,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
-			"${ANDROID_NDK_ROOT}/sysroot/usr/include",
+			"${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
 		defines { "BGFX_CONFIG_RENDERER_OPENGLES=1", }
@@ -858,7 +862,7 @@ function toolchain(_buildDir, _libDir)
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/arm-linux-androideabi",
+			"$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/arm-linux-androideabi",
 		}
 		buildoptions {
 			"-gcc-toolchain $(ANDROID_NDK_ARM)",
@@ -887,7 +891,7 @@ function toolchain(_buildDir, _libDir)
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/arm64-v8a",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/aarch64-linux-android",
+			"$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android",
 		}
 		buildoptions {
 			"-gcc-toolchain $(ANDROID_NDK_ARM64)",
@@ -913,7 +917,7 @@ function toolchain(_buildDir, _libDir)
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/x86_64-linux-android",
+			"$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/x86_64-linux-android",
 		}
 		buildoptions {
 			"-gcc-toolchain $(ANDROID_NDK_X86)",
