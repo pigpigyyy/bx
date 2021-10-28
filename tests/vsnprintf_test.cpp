@@ -179,6 +179,29 @@ TEST_CASE("vsnprintf s")
 	REQUIRE(test("(null)", "%s", NULL) );
 }
 
+TEST_CASE("vsnprintf t")
+{
+	size_t size = size_t(-1);
+
+	REQUIRE(test("-1", "%td", size) );
+
+	REQUIRE(test("3221225472", "%td", size_t(3221225472) ) );
+}
+
+TEST_CASE("vsnprintf n")
+{
+	char temp[64];
+
+	int32_t p0, p1, p2;
+	bx::snprintf(temp, sizeof(temp), "%n", &p0);
+	REQUIRE(0 == p0);
+
+	bx::snprintf(temp, sizeof(temp), "01%n23%n45%n", &p0, &p1, &p2);
+	REQUIRE(2 == p0);
+	REQUIRE(4 == p1);
+	REQUIRE(6 == p2);
+}
+
 TEST_CASE("vsnprintf g")
 {
 	REQUIRE(test("   0.01",  "%7.2g", .01) );
@@ -208,6 +231,11 @@ TEST_CASE("vsnprintf")
 		, hello.getLength(), hello.getPtr()
 		, world.getLength(), world.getPtr()
 		) );
+
+	REQUIRE(test("hello, world!", "%S, %S!"
+		, &hello
+		, &world
+		) );
 }
 
 TEST_CASE("vsnprintf write")
@@ -223,4 +251,16 @@ TEST_CASE("vsnprintf write")
 
 	bx::StringView str(tmp, len);
 	REQUIRE(0 == bx::strCmp(str, "1389") );
+}
+
+TEST_CASE("snprintf invalid")
+{
+	char temp[64];
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-0", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03.", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03.0", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03.0t", 1) );
 }
