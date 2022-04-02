@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include <bx/allocator.h>
@@ -412,7 +412,7 @@ namespace bx
 				++ptr;
 				--stringLen;
 
-				// Search pattern lenght can't be longer than the string.
+				// Search pattern length can't be longer than the string.
 				if (findLen > stringLen)
 				{
 					return NULL;
@@ -480,7 +480,7 @@ namespace bx
 			}
 		}
 
-		return _str;
+		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
 	StringView strLTrimSpace(const StringView& _str)
@@ -523,7 +523,9 @@ namespace bx
 				{
 					return StringView(ptr, ii + 1);
 				}
-			}
+		}
+
+			return StringView(_str.getPtr(), _str.getPtr());
 		}
 
 		return _str;
@@ -542,6 +544,8 @@ namespace bx
 					return StringView(ptr, ii + 1);
 				}
 			}
+			
+			return StringView(_str.getPtr(), _str.getPtr());
 		}
 
 		return _str;
