@@ -176,7 +176,7 @@ function toolchain(_buildDir, _libDir)
 		iosPlatform = _OPTIONS["with-ios"]
 	end
 
-	local macosPlatform = ""
+	local macosPlatform = "11.3"
 	if _OPTIONS["with-macos"] then
 		macosPlatform = _OPTIONS["with-macos"]
 	end
@@ -490,7 +490,7 @@ function toolchain(_buildDir, _libDir)
 		end
 
 		if "osx" == _OPTIONS["xcode"] then
-			action.xcode.macOSTargetPlatformVersion = str_or(macosPlatform, "10.11")
+			action.xcode.macOSTargetPlatformVersion = str_or(macosPlatform, "11.3")
 			premake.xcode.toolset = "macosx"
 			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
 
@@ -970,7 +970,7 @@ function toolchain(_buildDir, _libDir)
 			"-gcc-toolchain $(ANDROID_NDK_X86_64)",
 			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-x86_64"),
 			"-target x86_64-none-linux-android",
-			"-march=x86_64",
+			"-march=x86-64",
 			"-mtune=atom",
 			"-mstackrealign",
 			"-msse3",
@@ -1053,7 +1053,7 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-arch x86_64",
 			"-msse2",
-			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.11"),
+			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "11.3"),
 		}
 
 	configuration { "osx-arm64" }
@@ -1066,6 +1066,7 @@ function toolchain(_buildDir, _libDir)
 			"-arch arm64",
 			"-Wno-error=unused-command-line-argument",
 			"-Wno-unused-command-line-argument",
+			"-target arm64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "11.3"),
 		}
 
 	configuration { "osx*" }
