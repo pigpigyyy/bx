@@ -175,7 +175,7 @@ function toolchain(_buildDir, _libDir)
 		os.exit(1)
 	end
 
-	local androidPlatform = "android-28"
+	local androidApiLevel = 28
 	if _OPTIONS["with-android"] then
 		androidApiLevel = _OPTIONS["with-android"]
 	end
@@ -232,7 +232,6 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
-			end
 		elseif "wasm2js" == _OPTIONS["gcc"] or "wasm" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
@@ -754,6 +753,7 @@ function toolchain(_buildDir, _libDir)
 		flags {
 			"NoImportLib",
 		}
+		defines { "BGFX_CONFIG_RENDERER_OPENGLES=1", }
 		links {
 			"c",
 			"dl",
