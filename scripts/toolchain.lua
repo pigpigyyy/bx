@@ -508,7 +508,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "vs*", "not NX32", "not NX64" }
 		flags {
-			"EnableAVX",
+			"EnableSSE2",
 		}
 
 	configuration { "vs*", "not orbis", "not NX32", "not NX64" }
