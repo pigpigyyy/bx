@@ -12,6 +12,41 @@
 
 bx::AllocatorI* g_allocator;
 
+TEST_CASE("StringLiteral", "")
+{
+	constexpr bx::StringLiteral tmp[] = { "1389", "abvgd", "mac", "pod" };
+
+	REQUIRE(bx::isSorted(tmp, BX_COUNTOF(tmp) ) );
+
+	STATIC_REQUIRE(4 == tmp[0].getLength() );
+	REQUIRE(4 == bx::strLen(tmp[0]) );
+	REQUIRE(0 == bx::strCmp("1389", tmp[0]) );
+
+	STATIC_REQUIRE(5 == tmp[1].getLength() );
+	REQUIRE(5 == bx::strLen(tmp[1]) );
+	REQUIRE(0 == bx::strCmp("abvgd", tmp[1]) );
+
+	STATIC_REQUIRE(3 == tmp[2].getLength() );
+	REQUIRE(3 == bx::strLen(tmp[2]) );
+	REQUIRE(0 == bx::strCmp("mac", tmp[2]) );
+
+	STATIC_REQUIRE(3 == tmp[3].getLength() );
+	REQUIRE(3 == bx::strLen(tmp[3]) );
+	REQUIRE(0 == bx::strCmp("pod", tmp[3]) );
+
+	constexpr bx::StringLiteral copy(tmp[0]);
+
+	STATIC_REQUIRE(4 == copy.getLength() );
+	REQUIRE(4 == bx::strLen(copy) );
+	REQUIRE(0 == bx::strCmp("1389", copy) );
+
+	constexpr bx::StringView sv(tmp[1]);
+
+	REQUIRE(5 == sv.getLength() );
+	REQUIRE(5 == bx::strLen(sv) );
+	REQUIRE(0 == bx::strCmp("abvgd", sv) );
+}
+
 TEST_CASE("stringPrintfTy", "")
 {
 	std::string test;
@@ -549,7 +584,7 @@ TEST_CASE("strWord", "")
 TEST_CASE("strFindBlock", "")
 {
 	const bx::StringView test0("{ { {} {} abvgd; {} } }");
-	const bx::StringView test1(test0, 1);
+	const bx::StringView test1(test0, 1, INT32_MAX);
 
 	bx::StringView result = bx::strFindBlock(test1, '{', '}');
 	REQUIRE(19 == result.getLength() );
