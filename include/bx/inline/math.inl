@@ -138,6 +138,20 @@ namespace bx
 		return float( (0.0f < _a) - (0.0f > _a) );
 	}
 
+	inline BX_CONSTEXPR_FUNC bool signbit(float _a)
+	{
+		return -0.0f == _a ? 0.0f != _a : 0.0f > _a;
+	}
+
+	inline BX_CONSTEXPR_FUNC float copysign(float _value, float _sign)
+	{
+#if BX_COMPILER_MSVC
+		return signbit(_value) != signbit(_sign) ? -_value : _value;
+#else
+		return __builtin_copysign(_value, _sign);
+#endif // BX_COMPILER_MSVC
+	}
+
 	inline BX_CONSTEXPR_FUNC float abs(float _a)
 	{
 		return _a < 0.0f ? -_a : _a;
