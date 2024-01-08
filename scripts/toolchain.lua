@@ -78,12 +78,10 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
 			{ "linux-ppc64le-gcc",  "Linux (PPC64LE, GCC compiler)"  },
 			{ "linux-ppc64le-clang",  "Linux (PPC64LE, Clang compiler)"  },
+			{ "linux-riscv64-gcc",  "Linux (RISC-V 64, GCC compiler)"  },
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
-			{ "ios-simulator",   "iOS - Simulator"            },
-			{ "ios-simulator64", "iOS - Simulator 64"         },
 			{ "tvos-arm64",      "tvOS - ARM64"               },
-			{ "tvos-simulator",  "tvOS - Simulator"           },
 			{ "mingw-gcc",       "MinGW"                      },
 			{ "mingw-clang",     "MinGW (clang compiler)"     },
 			{ "netbsd",          "NetBSD"                     },
@@ -255,29 +253,11 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
-		elseif "ios-simulator" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator"))
-
-		elseif "ios-simulator64" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator64"))
-
 		elseif "tvos-arm64" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-arm64"))
-
-		elseif "tvos-simulator" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-simulator"))
 
 		elseif "linux-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
@@ -312,6 +292,9 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar  = "ar"
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-ppc64le-clang"))
+
+		elseif "linux-riscv64-gcc" == _OPTIONS["gcc"] then
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-riscv64-gcc"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW") then
@@ -858,6 +841,20 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,--gc-sections",
 		}
 
+	configuration { "linux-riscv64*" }
+		buildoptions {
+			"-Wunused-value",
+			"-Wundef",
+			"-march=rv64g"
+		}
+		links {
+			"rt",
+			"dl",
+		}
+		linkoptions {
+			"-Wl,--gc-sections",
+		}
+
 	configuration { "linux-ppc64le-gcc" }
 		targetdir (path.join(_buildDir, "linux_ppc64le_gcc/bin"))
 		objdir (path.join(_buildDir, "linux_ppc64le_gcc/obj"))
@@ -867,6 +864,11 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "linux_ppc64le_clang/bin"))
 		objdir (path.join(_buildDir, "linux_ppc64le_clang/obj"))
 		libdirs { path.join(_libDir, "lib/linux_ppc64le_clang") }
+
+	configuration { "linux-riscv64-gcc" }
+		targetdir (path.join(_buildDir, "linux_riscv64_gcc/bin"))
+		objdir (path.join(_buildDir, "linux_riscv64_gcc/obj"))
+		libdirs { path.join(_libDir, "lib/linux_riscv64_gcc") }
 
 	configuration { "wasm2js" }
 		targetdir (path.join(_buildDir, "wasm2js/bin"))
@@ -947,6 +949,8 @@ function toolchain(_buildDir, _libDir)
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
+--			"-Wno-overriding-t-option",
+--			"-mmacosx-version-min=13.0",
 		}
 		includedirs { path.join(bxDir, "include/compat/osx") }
 
@@ -959,6 +963,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
+--			"-mios-version-min=16.0",
 		}
 		includedirs { path.join(bxDir, "include/compat/ios") }
 
@@ -1069,24 +1074,6 @@ function toolchain(_buildDir, _libDir)
 			"-mtvos-version-min=9.0",
 			"-arch arm64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk",
-		}
-
-	configuration { "tvos-simulator" }
-		targetdir (path.join(_buildDir, "tvos-simulator/bin"))
-		objdir (path.join(_buildDir, "tvos-simulator/obj"))
-		libdirs { path.join(_libDir, "lib/tvos-simulator") }
-		linkoptions {
-			"-mtvos-simulator-version-min=9.0",
-			"-arch i386",
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk",
-			"-L/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/usr/lib/system",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/System/Library/Frameworks",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/System/Library/PrivateFrameworks",
-		}
-		buildoptions {
-			"-mtvos-simulator-version-min=9.0",
-			"-arch i386",
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk",
 		}
 
 	configuration { "orbis" }
