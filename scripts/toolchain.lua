@@ -135,7 +135,7 @@ function toolchain(_buildDir, _libDir)
 	newoption {
 		trigger     = "with-macos",
 		value       = "#",
-		description = "Set macOS target version (default 10.11).",
+		description = "Set macOS target version (default 10.15).",
 	}
 
 	newoption {
