@@ -757,7 +757,7 @@ function toolchain(_buildDir, _libDir)
 		flags {
 			"NoImportLib",
 		}
-		defines { "BGFX_CONFIG_RENDERER_OPENGLES=1", }
+		defines { "BGFX_CONFIG_RENDERER_OPENGLES=30", }
 		links {
 			"c",
 			"dl",
