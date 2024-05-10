@@ -28,6 +28,7 @@ local function crtNone()
 	}
 
 	configuration { "linux-*" }
+		defines { "BGFX_CONFIG_RENDERER_OPENGL_MIN_VERSION=33", "BGFX_CONFIG_RENDERER_OPENGLES_MIN_VERSION=30" }
 
 		buildoptions {
 			"-mpreferred-stack-boundary=4",
@@ -757,7 +758,7 @@ function toolchain(_buildDir, _libDir)
 		flags {
 			"NoImportLib",
 		}
-		defines { "BGFX_CONFIG_RENDERER_OPENGLES=30", }
+		defines { "BGFX_CONFIG_RENDERER_OPENGLES=30" }
 		links {
 			"c",
 			"dl",
