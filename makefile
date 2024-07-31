@@ -17,6 +17,8 @@ all:
 	$(GENIE) --gcc=osx-x64         gmake
 	$(GENIE) --gcc=osx-arm64       gmake
 	$(GENIE) --gcc=ios-arm         gmake
+	$(GENIE) --gcc=ios-simulator   gmake
+	$(GENIE) --gcc=tvos-simulator  gmake
 	$(GENIE)                       xcode8
 
 .build/projects/gmake-android-arm:
@@ -89,9 +91,9 @@ mingw-clang: mingw-clang-debug32 mingw-clang-release32 mingw-clang-debug64 mingw
 .build/projects/gmake-osx-x64:
 	$(GENIE) --gcc=osx-x64 gmake
 osx-x64-debug: .build/projects/gmake-osx-x64
-	make -C .build/projects/gmake-osx config=debug
+	make -C .build/projects/gmake-osx-x64 config=debug
 osx-x64-release: .build/projects/gmake-osx-x64
-	make -C .build/projects/gmake-osx config=release
+	make -C .build/projects/gmake-osx-x64 config=release
 osx-x64: osx-x64-debug osx-x64-release
 
 .build/projects/gmake-osx-arm64:
@@ -109,6 +111,14 @@ ios-arm-debug: .build/projects/gmake-ios-arm
 ios-arm-release: .build/projects/gmake-ios-arm
 	make -R -C .build/projects/gmake-ios-arm config=release
 ios-arm: ios-arm-debug ios-arm-release
+
+.build/projects/gmake-ios-simulator:
+	$(GENIE) --gcc=ios-simulator gmake
+ios-simulator-debug: .build/projects/gmake-ios-simulator
+	make -R -C .build/projects/gmake-ios-simulator config=debug
+ios-simulator-release: .build/projects/gmake-ios-simulator
+	make -R -C .build/projects/gmake-ios-simulator config=release
+ios-simulator: ios-simulator-debug ios-simulator-release
 
 rebuild-shaders:
 	make -R -C examples rebuild
