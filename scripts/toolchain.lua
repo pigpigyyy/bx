@@ -71,7 +71,6 @@ function toolchain(_buildDir, _libDir)
 			{ "android-x86_64",  "Android - x86_64"           },
 			{ "wasm2js",         "Emscripten/Wasm2JS"         },
 			{ "wasm",            "Emscripten/Wasm"            },
-			{ "freebsd",         "FreeBSD"                    },
 			{ "linux-gcc",       "Linux (GCC compiler)"       },
 			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
 			{ "linux-clang",     "Linux (Clang compiler)"     },
@@ -90,7 +89,6 @@ function toolchain(_buildDir, _libDir)
 			{ "tvos-simulator",  "tvOS - Simulator"           },
 			{ "mingw-gcc",       "MinGW"                      },
 			{ "mingw-clang",     "MinGW (clang compiler)"     },
-			{ "netbsd",          "NetBSD"                     },
 			{ "osx-x64",         "OSX - x64"                  },
 			{ "osx-arm64",       "OSX - ARM64"                },
 			{ "orbis",           "Orbis"                      },
@@ -261,9 +259,6 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.namestyle = "Emscripten"
 			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
-		elseif "freebsd" == _OPTIONS["gcc"] then
-			location (path.join(_buildDir, "projects", _ACTION .. "-freebsd"))
-
 		elseif "ios-arm"   == _OPTIONS["gcc"]
 			or "ios-arm64" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
@@ -303,13 +298,13 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-simulator"))
 
 		elseif "linux-gcc" == _OPTIONS["gcc"] then
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-gcc"))
 
 		elseif "linux-gcc-afl" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "afl-gcc"
 			premake.gcc.cxx = "afl-g++"
 			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-gcc"))
 
 		elseif "linux-clang" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "clang"
@@ -359,6 +354,14 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-mingw-gcc"))
 
 		elseif "mingw-clang" == _OPTIONS["gcc"] then
+			if not os.getenv("MINGW") then
+				print("Set MINGW environment variable.")
+			end
+
+			if not os.getenv("CLANG") then
+				print("Set CLANG environment variable.")
+			end
+
 			premake.gcc.cc   = "$(CLANG)/bin/clang"
 			premake.gcc.cxx  = "$(CLANG)/bin/clang++"
 			premake.gcc.ar   = "$(MINGW)/bin/ar"
@@ -366,12 +369,8 @@ function toolchain(_buildDir, _libDir)
 --			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-mingw-clang"))
 
-		elseif "netbsd" == _OPTIONS["gcc"] then
-			location (path.join(_buildDir, "projects", _ACTION .. "-netbsd"))
-
 		elseif "osx-x64"   == _OPTIONS["gcc"]
 			or "osx-arm64" == _OPTIONS["gcc"] then
-
 
 			if os.is("linux") then
 				if not os.getenv("OSXCROSS") then
@@ -529,6 +528,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "*-clang" }
 		buildoptions {
+			"-Wno-nan-infinity-disabled",
 			"-Wno-tautological-constant-compare",
 		}
 
@@ -638,12 +638,12 @@ function toolchain(_buildDir, _libDir)
 			"MINGW_HAS_SECURE_API=1",
 		}
 		buildoptions {
+			"-Wa,-mbig-obj",
+			"-Wundef",
 			"-Wunused-value",
 			"-fdata-sections",
 			"-ffunction-sections",
 			"-msse4.2",
-			"-Wunused-value",
-			"-Wundef",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
@@ -676,6 +676,7 @@ function toolchain(_buildDir, _libDir)
 			"-isystem $(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++",
 			"-isystem $(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32",
 			"-isystem $(MINGW)/x86_64-w64-mingw32/include",
+			"-Wno-nan-infinity-disabled",
 		}
 		linkoptions {
 			"-Qunused-arguments",
@@ -933,23 +934,6 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "wasm/obj"))
 		libdirs { path.join(_libDir, "lib/wasm") }
 
-	configuration { "freebsd" }
-		targetdir (path.join(_buildDir, "freebsd/bin"))
-		objdir (path.join(_buildDir, "freebsd/obj"))
-		libdirs { path.join(_libDir, "lib/freebsd") }
-		includedirs {
-			path.join(bxDir, "include/compat/freebsd"),
-		}
-
-	configuration { "xbox360" }
-		targetdir (path.join(_buildDir, "xbox360/bin"))
-		objdir (path.join(_buildDir, "xbox360/obj"))
-		includedirs { path.join(bxDir, "include/compat/msvc") }
-		libdirs { path.join(_libDir, "lib/xbox360") }
-		defines {
-			"NOMINMAX",
-		}
-
 	configuration { "durango" }
 		targetdir (path.join(_buildDir, "durango/bin"))
 		objdir (path.join(_buildDir, "durango/obj"))
@@ -958,14 +942,6 @@ function toolchain(_buildDir, _libDir)
 		removeflags { "StaticRuntime" }
 		defines {
 			"NOMINMAX",
-		}
-
-	configuration { "netbsd" }
-		targetdir (path.join(_buildDir, "netbsd/bin"))
-		objdir (path.join(_buildDir, "netbsd/obj"))
-		libdirs { path.join(_libDir, "lib/netbsd") }
-		includedirs {
-			path.join(bxDir, "include/compat/freebsd"),
 		}
 
 	configuration { "osx-x64" }
